@@ -1,6 +1,9 @@
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendPasswordResetEmail,
   signOut,
   User
 } from "firebase/auth";
@@ -15,6 +18,12 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
 
+// Initialize Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 // Auth functions
 export const loginUser = async (email: string, password: string) => {
   return await signInWithEmailAndPassword(auth, email, password);
@@ -22,6 +31,14 @@ export const loginUser = async (email: string, password: string) => {
 
 export const registerUser = async (email: string, password: string) => {
   return await createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInWithGoogle = async () => {
+  return await signInWithPopup(auth, googleProvider);
+};
+
+export const resetPassword = async (email: string) => {
+  return await sendPasswordResetEmail(auth, email);
 };
 
 export const logoutUser = async () => {

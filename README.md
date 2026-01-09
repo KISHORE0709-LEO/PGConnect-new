@@ -29,34 +29,6 @@
 - **Secure Authentication**: Firebase-based user management
 - **Modern UI/UX**: Clean, intuitive interface with smooth animations
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/pgconnect.git
-cd pgconnect
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173) to view the app.
-
-### Build for Production
-
-```bash
-npm run build
-npm run preview
-```
 
 ## 🛠️ Tech Stack
 
@@ -105,49 +77,3 @@ src/
 3. **Building Config** - Set up floors, rooms, sharing options
 4. **Analytics** - Monitor revenue and performance
 
-## 🔧 Development
-
-### Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript compiler
-```
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [React](https://reactjs.org/) - UI library
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Radix UI](https://www.radix-ui.com/) - Component primitives
-- [Lucide](https://lucide.dev/) - Icon library
-
----
-
-<div align="center">
-  <strong>Built with ❤️ for the student community</strong>
-</div>

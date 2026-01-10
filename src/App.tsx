@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Intro from "./pages/Intro";
 import Index from "./pages/Index";
 import StudentDashboard from "./pages/StudentDashboard";
+import CitySelection from "./pages/CitySelection";
 import PGDetails from "./pages/PGDetails";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import OwnerPGDashboard from "./pages/OwnerPGDashboard";
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/" element={<Navigate to="/intro" replace />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/city-selection" element={<CitySelection />} />
           <Route path="/student-dashboard" element={
             <>
               <Navbar />

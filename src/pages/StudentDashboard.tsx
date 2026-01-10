@@ -62,6 +62,7 @@ const StudentDashboard = () => {
   const [allPgs, setAllPgs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCity, setSelectedCity] = useState('');
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [matchingInProgress, setMatchingInProgress] = useState(false);
   const [matchResults, setMatchResults] = useState([]);
@@ -94,6 +95,15 @@ const StudentDashboard = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    // Get selected city from localStorage
+    const city = localStorage.getItem('selectedCity');
+    if (!city) {
+      // If no city selected, redirect to city selection
+      navigate('/city-selection');
+      return;
+    }
+    setSelectedCity(city);
+
     const fetchPGs = async () => {
       try {
         setError(null);
@@ -618,9 +628,23 @@ const StudentDashboard = () => {
           <div className="flex-1">
             {/* Results Header */}
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">
-                {loading ? 'Loading...' : `Showing ${pgs.length} properties in Bangalore`}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-bold">
+                  {loading ? 'Loading...' : `Showing ${pgs.length} properties in ${selectedCity}`}
+                </h2>
+                <div className="flex items-center gap-2 mt-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{selectedCity}</span>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    onClick={() => navigate('/city-selection')}
+                    className="p-0 h-auto text-primary"
+                  >
+                    Change City
+                  </Button>
+                </div>
+              </div>
               <div className="flex gap-2">
                 <Button 
                   variant={!showMapView ? "default" : "outline"} 

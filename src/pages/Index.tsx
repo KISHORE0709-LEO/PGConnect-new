@@ -19,7 +19,7 @@ const Index = () => {
 
   const handleStudentClick = () => {
     if (isAuthenticated) {
-      navigate('/student');
+      navigate('/city-selection');
     } else {
       navigate('/auth?role=student');
     }

@@ -73,7 +73,7 @@ const Auth = () => {
         if (userProfile?.role === 'owner') {
           navigate('/owner-dashboard');
         } else {
-          navigate('/student-dashboard');
+          navigate('/city-selection');
         }
       }, 1000);
       
@@ -150,7 +150,7 @@ const Auth = () => {
         if (userType === 'owner') {
           navigate('/owner/register-pg');
         } else {
-          navigate('/student-dashboard');
+          navigate('/city-selection');
         }
       }, 1000);
       
@@ -207,7 +207,7 @@ const Auth = () => {
         if (userProfile?.role === 'owner') {
           navigate('/owner-dashboard');
         } else {
-          navigate('/student-dashboard');
+          navigate('/city-selection');
         }
       }, 1000);
       

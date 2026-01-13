@@ -474,7 +474,7 @@ const StudentDashboard = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
       <header className="bg-card border-b sticky top-0 z-50 backdrop-blur-lg bg-card/95">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="w-full px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <h1 className="text-2xl font-bold hover:text-primary/80 transition-colors">PG<span className="text-primary">Connect</span></h1>
             <Badge variant="secondary">Student</Badge>
@@ -486,8 +486,8 @@ const StudentDashboard = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex gap-8">
+      <div className="max-w-full mx-auto px-6 py-8">
+        <div className="flex gap-6">
           {/* Sidebar Filters */}
           <div className="w-80 flex-shrink-0">
             <Card className="p-6 sticky top-24 overflow-y-auto max-h-[calc(100vh-8rem)]">
@@ -625,7 +625,7 @@ const StudentDashboard = () => {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 ml-4">
             {/* Results Header */}
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -725,7 +725,7 @@ const StudentDashboard = () => {
                             </div>
                             
                             {/* Info Card on Hover */}
-                            <div className="absolute top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <div className="absolute top-12 left-1/2 transform -translate-x-1/3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                               <Card className="p-3 w-64 shadow-xl border-2">
                                 <div className="flex gap-3">
                                   <img src={pg.image} alt={pg.name} className="w-16 h-16 rounded object-cover" />
@@ -773,70 +773,96 @@ const StudentDashboard = () => {
                   </div>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="space-y-4">
                   {pgs.map((pg) => (
-                  <Card
-                    key={pg.id}
-                    className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={pg.image}
-                        alt={pg.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-success">
-                        {pg.availability} rooms available
-                      </Badge>
-                    </div>
-
-                    <div className="p-5">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-xl font-bold mb-1">{pg.name}</h3>
-                          <div className="flex items-center text-sm text-muted-foreground mb-2">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {pg.location}
+                    <Card
+                      key={pg.id}
+                      className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200"
+                      onClick={() => navigate(`/student/pg/${pg.id}`)}
+                    >
+                      <div className="flex">
+                        {/* Image Section */}
+                        <div className="relative w-64 h-48 flex-shrink-0">
+                          <img
+                            src={pg.image}
+                            alt={pg.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-3 left-3">
+                            <Badge className="bg-green-600 text-white text-xs px-2 py-1">
+                              {pg.availability} Available
+                            </Badge>
+                          </div>
+                          <div className="absolute top-3 right-3">
+                            <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-xs font-medium">{pg.rating}</span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-lg">
-                          <Star className="h-4 w-4 fill-primary text-primary" />
-                          <span className="font-semibold">{pg.rating}</span>
+
+                        {/* Content Section */}
+                        <div className="flex-1 p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900 mb-1">{pg.name}</h3>
+                              <div className="flex items-center text-sm text-gray-600 mb-2">
+                                <MapPin className="h-4 w-4 mr-1" />
+                                <span>{pg.location}</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="flex items-center text-xl font-bold text-blue-600">
+                                <IndianRupee className="h-4 w-4" />
+                                <span>{pg.price.toLocaleString()}</span>
+                              </div>
+                              <span className="text-xs text-gray-500">/month</span>
+                            </div>
+                          </div>
+
+                          {/* Tags Row */}
+                          <div className="flex items-center gap-2 mb-3">
+                            <Badge variant="outline" className="text-xs px-2 py-1 border-blue-200 text-blue-700">
+                              {pg.gender}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs px-2 py-1 border-green-200 text-green-700">
+                              {pg.sharing}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs px-2 py-1 border-purple-200 text-purple-700">
+                              {pg.nearestCollege}
+                            </Badge>
+                          </div>
+
+                          {/* Amenities */}
+                          <div className="flex items-center gap-2 mb-3 flex-wrap">
+                            {pg.amenities.slice(0, 4).map((amenity) => (
+                              <div key={amenity} className="flex items-center gap-1 text-xs text-gray-600">
+                                {amenity === "WiFi" && <Wifi className="h-3 w-3" />}
+                                {amenity === "Food Included" && <Utensils className="h-3 w-3" />}
+                                {amenity === "AC" && <AirVent className="h-3 w-3" />}
+                                {amenity === "Attached Bathroom" && <Bath className="h-3 w-3" />}
+                                {amenity === "Power Backup" && <Zap className="h-3 w-3" />}
+                                {amenity === "Laundry" && <Shirt className="h-3 w-3" />}
+                                <span>{amenity}</span>
+                              </div>
+                            ))}
+                            {pg.amenities.length > 4 && (
+                              <span className="text-xs text-gray-500">+{pg.amenities.length - 4} more</span>
+                            )}
+                          </div>
+
+                          {/* Bottom Row */}
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs text-gray-500">
+                              {pg.reviews} reviews • {pg.distance}km from college
+                            </div>
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white px-4">
+                              View Details
+                            </Button>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-4 mb-4 text-sm">
-                        <Badge variant="secondary">{pg.nearestCollege}</Badge>
-                        <Badge variant="outline">{pg.gender}</Badge>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          <span>{pg.sharing}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 mb-4 flex-wrap">
-                        {pg.amenities.map((amenity) => (
-                          <Badge key={amenity} variant="secondary" className="text-xs">
-                            {amenity === "WiFi" && <Wifi className="h-3 w-3 mr-1" />}
-                            {amenity === "Food" && <Utensils className="h-3 w-3 mr-1" />}
-                            {amenity}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-2xl font-bold text-primary">
-                          <IndianRupee className="h-5 w-5" />
-                          {pg.price.toLocaleString()}
-                          <span className="text-sm text-muted-foreground font-normal ml-1">/month</span>
-                        </div>
-                        <Button size="sm" onClick={() => navigate(`/student/pg/${pg.id}`)}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
+                    </Card>
                   ))}
                 </div>
               )

@@ -135,6 +135,20 @@ const OwnerDashboard = () => {
       case "overview":
         return (
           <div className="space-y-8">
+            {/* Greeting Section */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Good Morning, Robo</h2>
+              <p className="text-gray-600 mb-2">Here's your property overview for today</p>
+              <p className="text-sm text-gray-500">{getCurrentDate()}</p>
+              <div className="mt-4">
+                <input
+                  type="text"
+                  placeholder="Search properties..."
+                  className="pl-4 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                />
+              </div>
+            </div>
+            
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300">
@@ -708,35 +722,17 @@ const OwnerDashboard = () => {
               </div>
             </button>
             
-          <div className="flex items-center gap-3">
             <Button
               onClick={() => navigate('/home')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              variant="ghost"
+              className="text-blue-600 hover:text-blue-700 font-bold text-xl"
             >
-              ← Back to Home
+              PGConnect
             </Button>
-            <div className="ml-4">
-              <h2 className="text-xl font-semibold text-gray-900">Good Morning, Robo</h2>
-              <p className="text-sm text-gray-500">Here's your property overview for today</p>
-            </div>
-          </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>{getCurrentDate()}</span>
-            </div>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search properties..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Search className="h-4 w-4 absolute left-2.5 top-2.5 text-gray-400" />
-            </div>
+
             <div className="relative">
               <Button 
                 variant="ghost" 

@@ -11,7 +11,7 @@ const Index = () => {
 
   const handleOwnerClick = () => {
     if (isAuthenticated) {
-      navigate('/owner/register-pg');
+      navigate('/owner-dashboard');
     } else {
       navigate('/auth?role=owner');
     }

@@ -70,11 +70,7 @@ const Auth = () => {
       showMessage('success', 'Login successful! Redirecting...');
       
       setTimeout(() => {
-        if (userProfile?.role === 'owner') {
-          navigate('/owner-dashboard');
-        } else {
-          navigate('/city-selection');
-        }
+        navigate('/home');
       }, 1000);
       
     } catch (error: any) {
@@ -147,11 +143,7 @@ const Auth = () => {
       showMessage('success', 'Account created successfully! Redirecting...');
       
       setTimeout(() => {
-        if (userType === 'owner') {
-          navigate('/owner/register-pg');
-        } else {
-          navigate('/city-selection');
-        }
+        navigate('/home');
       }, 1000);
       
     } catch (error: any) {
@@ -204,11 +196,7 @@ const Auth = () => {
       showMessage('success', 'Google sign-in successful! Redirecting...');
       
       setTimeout(() => {
-        if (userProfile?.role === 'owner') {
-          navigate('/owner-dashboard');
-        } else {
-          navigate('/city-selection');
-        }
+        navigate('/home');
       }, 1000);
       
     } catch (error: any) {
@@ -440,30 +428,6 @@ const Auth = () => {
                   onChange={(value) => handleInputChange('confirmPassword', value)}
                   placeholder="Confirm your password"
                 />
-              </div>
-            )}
-
-            {!isLogin && (
-              <div>
-                <Label className="mb-3 block">Account Type</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    type="button"
-                    variant={userType === "student" ? "default" : "outline"}
-                    onClick={() => setUserType("student")}
-                    size="sm"
-                  >
-                    Student
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={userType === "owner" ? "default" : "outline"}
-                    onClick={() => setUserType("owner")}
-                    size="sm"
-                  >
-                    PG Owner
-                  </Button>
-                </div>
               </div>
             )}
 

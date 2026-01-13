@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Upload, AlertCircle } from "lucide
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { useOwnerStatus } from "@/hooks/useOwnerStatus";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ import FlexibleBuildingConfig from "@/components/FlexibleBuildingConfig";
 const RegisterPG = () => {
   const navigate = useNavigate();
   const { user, setPGRegistrationSuccess } = useAuth();
+  const { markAsOwner } = useOwnerStatus();
   const [step, setStep] = useState(1);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showBuildingConfig, setShowBuildingConfig] = useState(false);
@@ -131,6 +133,9 @@ const RegisterPG = () => {
       console.log('PG successfully created with ID:', docRef.id);
       console.log('Check Firebase Console under Firestore Database > pgs collection');
       
+      // Mark user as owner after successful PG registration
+      markAsOwner();
+      
       toast.success('PG registered successfully!');
       setShowSuccessDialog(true);
     } catch (error) {
@@ -162,11 +167,11 @@ const RegisterPG = () => {
       }
       
       toast.success("Building configuration saved!");
-      navigate('/owner-dashboard');
+      navigate('/owner/dashboard');
     } catch (error) {
       console.error('Error saving building config:', error);
       toast.success("Building configuration saved!");
-      navigate('/owner-dashboard');
+      navigate('/owner/dashboard');
     }
   };
 

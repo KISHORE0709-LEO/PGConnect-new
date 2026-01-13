@@ -5,6 +5,7 @@ import { getUserProfile } from '../lib/firebase';
 
 interface User {
   id: number;
+  uid: string;
   name: string;
   email: string;
   phone: string;
@@ -80,6 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setIsAuthenticated(true);
             setUser({
               id: parseInt(firebaseUser.uid.slice(-6), 16),
+              uid: firebaseUser.uid,
               name: userProfile.fullName || firebaseUser.displayName || '',
               email: firebaseUser.email || '',
               phone: userProfile.phone || '',

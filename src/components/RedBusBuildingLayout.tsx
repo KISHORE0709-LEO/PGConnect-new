@@ -1,257 +1,368 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Users, IndianRupee, Wifi, Car, Utensils, Shield } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Users,
+  IndianRupee,
+  User,
+  Phone,
+  Mail,
+  Calendar,
+  MapPin,
+  Bed,
+  Home
+} from "lucide-react";
 
-interface Room {
+interface RoomData {
   id: string;
   number: string;
-  rent: number;
+  floor: number;
+  price: number;
   capacity: number;
   occupied: number;
-  occupants: Array<{
+  status: 'available' | 'occupied' | 'sold';
+  roommates: Array<{
     name: string;
+    age: number;
     college: string;
-    year: string;
+    course: string;
+    phone: string;
+    joinDate: string;
   }>;
-  amenities: string[];
-  sharingType: string;
 }
 
-interface Floor {
-  id: number;
-  name: string;
-  rooms: Room[];
-}
-
-interface BuildingVisualizerProps {
+interface RedBusBuildingLayoutProps {
+  pgId?: string;
   floors?: number;
   roomsPerFloor?: number;
 }
 
-// Sample data generator
-const generateBuildingData = (numFloors: number, roomsPerFloor: number): Floor[] => {
-  const floors: Floor[] = [];
-  const floorNames = ["Ground Floor", "First Floor", "Second Floor", "Third Floor", "Fourth Floor"];
-  
-  for (let i = 0; i < numFloors; i++) {
-    const floorName = i < floorNames.length ? floorNames[i] : `Floor ${i + 1}`;
-    const floorPrefix = i === 0 ? "G" : String.fromCharCode(65 + i - 1); // G, A, B, C...
-    
-    const rooms: Room[] = [];
-    for (let j = 1; j <= roomsPerFloor; j++) {
-      const roomNumber = `${floorPrefix}${j.toString().padStart(2, '0')}`;
-      const capacity = Math.floor(Math.random() * 3) + 1; // 1-3 capacity
-      const occupied = Math.floor(Math.random() * (capacity + 1)); // 0 to capacity
-      
-      rooms.push({
-        id: roomNumber,
-        number: roomNumber,
-        rent: 7500 + (Math.floor(Math.random() * 6) * 500),
-        capacity,
-        occupied,
-        occupants: Array.from({ length: occupied }, (_, k) => ({
-          name: `Student ${k + 1}`,
-          college: ["RVCE", "PESIT", "Christ", "IIT", "IISc"][Math.floor(Math.random() * 5)],
-          year: ["1st Year", "2nd Year", "3rd Year", "4th Year"][Math.floor(Math.random() * 4)]
-        })),
-        amenities: ["WiFi", "AC", "Attached Bathroom", "Balcony"].slice(0, Math.floor(Math.random() * 4) + 1),
-        sharingType: capacity === 1 ? "Single" : capacity === 2 ? "Double" : "Triple"
-      });
+const RedBusBuildingLayout = ({ pgId, floors = 3, roomsPerFloor = 12 }: RedBusBuildingLayoutProps) => {
+  const [rooms, setRooms] = useState<RoomData[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<RoomData | null>(null);
+  const [showRoomModal, setShowRoomModal] = useState(false);
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      if (!pgId) {
+        // Generate sample data if no pgId
+        setRooms(generateSampleRooms());
+        return;
+      }
+
+      try {
+        const { db } = await import('@/config/firebase');
+        const { doc, getDoc } = await import('firebase/firestore');
+        
+        const pgRef = doc(db, 'pgs', pgId);
+        const pgSnap = await getDoc(pgRef);
+        
+        if (pgSnap.exists()) {
+          const pgData = pgSnap.data();
+          if (pgData.buildingLayout && pgData.buildingLayout.rooms) {
+            // Convert Firebase data to our format
+            const firebaseRooms = pgData.buildingLayout.rooms.map(room => ({
+              id: room.id || room.number,
+              number: room.number,
+              floor: (room.floorId || 0) + 1, // Convert 0-based to 1-based
+              price: room.rent || 8000,
+              capacity: room.capacity || 2,
+              occupied: room.occupied || 0,
+              status: room.status || 'available',
+              roommates: (room.occupants || []).map(occupant => ({
+                name: occupant.name,
+                age: 20,
+                college: occupant.college || 'Unknown',
+                course: occupant.year || 'Unknown',
+                phone: `+91 ${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                joinDate: new Date().toLocaleDateString()
+              }))
+            }));
+            setRooms(firebaseRooms);
+          } else {
+            setRooms(generateSampleRooms());
+          }
+        } else {
+          setRooms(generateSampleRooms());
+        }
+      } catch (error) {
+        console.error('Error fetching room data:', error);
+        setRooms(generateSampleRooms());
+      }
+    };
+
+    const generateSampleRooms = () => {
+      // Generate sample room data (existing code)
+      const roomData: RoomData[] = [];
+      const sampleNames = [
+        "Aarav Sharma", "Vivek Kumar", "Priya Singh", "Rohan Patel", "Ananya Gupta",
+        "Arjun Mehta", "Diya Verma", "Karan Singh", "Sneha Reddy", "Rahul Jain"
+      ];
+      const colleges = ["NMIT", "RVCE", "IISc", "PESIT", "Christ University"];
+      const courses = ["Computer Science", "Electronics", "Mechanical", "Civil", "Information Science"];
+
+      for (let floor = 1; floor <= floors; floor++) {
+        for (let room = 1; room <= roomsPerFloor; room++) {
+          const roomNumber = `${floor}${room.toString().padStart(2, '0')}`;
+          const capacity = Math.floor(Math.random() * 3) + 1;
+          const occupied = Math.floor(Math.random() * (capacity + 1));
+          const basePrice = 8000 + (Math.floor(Math.random() * 5) * 500);
+          
+          const roommates = [];
+          for (let i = 0; i < occupied; i++) {
+            roommates.push({
+              name: sampleNames[Math.floor(Math.random() * sampleNames.length)],
+              age: 18 + Math.floor(Math.random() * 6),
+              college: colleges[Math.floor(Math.random() * colleges.length)],
+              course: courses[Math.floor(Math.random() * courses.length)],
+              phone: `+91 ${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+              joinDate: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString()
+            });
+          }
+
+          let status: 'available' | 'occupied' | 'sold' = 'available';
+          if (occupied === capacity) status = 'sold';
+          else if (occupied > 0) status = 'occupied';
+
+          roomData.push({
+            id: roomNumber,
+            number: roomNumber,
+            floor,
+            price: basePrice,
+            capacity,
+            occupied,
+            status,
+            roommates
+          });
+        }
+      }
+      return roomData;
+    };
+
+    fetchRoomData();
+  }, [pgId, floors, roomsPerFloor]);
+
+  const getRoomColor = (room: RoomData) => {
+    switch (room.status) {
+      case 'available': return 'border-green-400 bg-green-50 hover:bg-green-100';
+      case 'occupied': return 'border-blue-400 bg-blue-50 hover:bg-blue-100';
+      case 'sold': return 'border-gray-400 bg-gray-200';
+      default: return 'border-gray-300 bg-white';
     }
-    
-    floors.push({ id: i + 1, name: floorName, rooms });
-  }
-  
-  return floors;
-};
-
-const BuildingVisualizer = ({ floors = 3, roomsPerFloor = 6 }: BuildingVisualizerProps) => {
-  const [buildingData] = useState(() => generateBuildingData(floors, roomsPerFloor));
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [activeFloor, setActiveFloor] = useState(0);
-
-  const getRoomStatus = (room: Room) => {
-    if (room.occupied === 0) return 'available';
-    if (room.occupied >= room.capacity) return 'occupied';
-    return 'partial';
   };
 
-  const getRoomColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'border-green-500 bg-green-50 hover:bg-green-100 hover:shadow-md';
-      case 'occupied': return 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-60';
-      case 'partial': return 'border-yellow-500 bg-yellow-50 hover:bg-yellow-100 hover:shadow-md';
-      default: return 'border-gray-300';
-    }
+  const handleRoomClick = (room: RoomData) => {
+    setSelectedRoom(room);
+    setShowRoomModal(true);
   };
 
-  const handleRoomClick = (room: Room) => {
-    const status = getRoomStatus(room);
-    if (status !== 'occupied') {
-      setSelectedRoom(room);
-    }
+  const renderFloor = (floorNumber: number) => {
+    const floorRooms = rooms.filter(room => room.floor === floorNumber);
+    const leftSide = floorRooms.slice(0, roomsPerFloor / 2);
+    const rightSide = floorRooms.slice(roomsPerFloor / 2);
+
+    return (
+      <div key={floorNumber} className="mb-8">
+        <div className="text-center mb-4">
+          <Badge variant="outline" className="text-lg px-4 py-2 font-bold">
+            Floor {floorNumber}
+          </Badge>
+        </div>
+        
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
+          {/* Left Side Rooms */}
+          <div className="grid grid-cols-2 gap-3">
+            {leftSide.map((room) => (
+              <div
+                key={room.id}
+                className={`relative w-24 h-32 border-2 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${getRoomColor(room)}`}
+                onClick={() => handleRoomClick(room)}
+                style={{
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  transform: 'perspective(100px) rotateX(5deg)'
+                }}
+              >
+                <div className="p-2 h-full flex flex-col justify-between">
+                  <div className="text-xs font-bold text-center">{room.number}</div>
+                  <div className="text-center">
+                    <div className="text-xs text-green-600 font-semibold">
+                      ₹{room.price.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {room.occupied}/{room.capacity}
+                    </div>
+                    {room.status === 'sold' && (
+                      <div className="text-xs text-red-600 font-bold">Sold</div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* 3D Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg pointer-events-none"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Center Corridor */}
+          <div className="flex flex-col items-center mx-8">
+            <div className="w-16 h-16 bg-gray-100 rounded-full border-4 border-gray-300 flex items-center justify-center mb-2">
+              <Home className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="text-xs text-gray-500 font-medium">Corridor</div>
+            <div className="w-1 h-20 bg-gray-300 my-2"></div>
+          </div>
+
+          {/* Right Side Rooms */}
+          <div className="grid grid-cols-2 gap-3">
+            {rightSide.map((room) => (
+              <div
+                key={room.id}
+                className={`relative w-24 h-32 border-2 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${getRoomColor(room)}`}
+                onClick={() => handleRoomClick(room)}
+                style={{
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  transform: 'perspective(100px) rotateX(5deg)'
+                }}
+              >
+                <div className="p-2 h-full flex flex-col justify-between">
+                  <div className="text-xs font-bold text-center">{room.number}</div>
+                  <div className="text-center">
+                    <div className="text-xs text-green-600 font-semibold">
+                      ₹{room.price.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {room.occupied}/{room.capacity}
+                    </div>
+                    {room.status === 'sold' && (
+                      <div className="text-xs text-red-600 font-bold">Sold</div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* 3D Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg pointer-events-none"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="w-full space-y-6">
-      {/* Floor Navigation */}
-      <div className="flex flex-wrap gap-2 justify-center">
-        {buildingData.map((floor, index) => (
-          <Button
-            key={floor.id}
-            variant={activeFloor === index ? "default" : "outline"}
-            size="sm"
-            onClick={() => setActiveFloor(index)}
-          >
-            {floor.name}
-          </Button>
-        ))}
+    <div className="w-full bg-gradient-to-b from-blue-50 to-white p-8 rounded-xl">
+      {/* Legend */}
+      <div className="flex justify-center gap-6 mb-8">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-green-400 bg-green-50 rounded"></div>
+          <span className="text-sm">Available</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-blue-400 bg-blue-50 rounded"></div>
+          <span className="text-sm">Partially Occupied</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-gray-400 bg-gray-200 rounded"></div>
+          <span className="text-sm">Fully Occupied</span>
+        </div>
       </div>
 
-      {/* Active Floor Layout */}
-      <Card className="p-6">
-        <div className="text-center mb-6">
-          <h3 className="text-xl font-bold">{buildingData[activeFloor]?.name}</h3>
-          <Badge variant="secondary" className="mt-2">
-            {buildingData[activeFloor]?.rooms.filter(r => getRoomStatus(r) === 'available').length} Available Rooms
-          </Badge>
-        </div>
-
-        {/* Room Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {buildingData[activeFloor]?.rooms.map((room) => {
-            const status = getRoomStatus(room);
-            return (
-              <div
-                key={room.id}
-                className={`
-                  p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 transform
-                  ${getRoomColor(status)}
-                  ${status === 'occupied' ? '' : 'hover:scale-105'}
-                `}
-                onClick={() => handleRoomClick(room)}
-              >
-                <div className="text-center">
-                  <div className="font-bold text-sm mb-1">{room.number}</div>
-                  <div className="text-xs text-muted-foreground mb-2">
-                    ₹{room.rent.toLocaleString()}
-                  </div>
-                  <div className="text-xs">
-                    <span className={`
-                      px-2 py-1 rounded-full text-xs font-medium
-                      ${status === 'available' ? 'bg-green-200 text-green-800' :
-                        status === 'partial' ? 'bg-yellow-200 text-yellow-800' :
-                        'bg-gray-200 text-gray-600'}
-                    `}>
-                      {room.occupied}/{room.capacity}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Legend */}
-      <div className="flex justify-center gap-6 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-green-500 bg-green-50 rounded"></div>
-          <span>Available</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-yellow-500 bg-yellow-50 rounded"></div>
-          <span>Partially Occupied</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-gray-300 bg-gray-100 rounded"></div>
-          <span>Fully Occupied</span>
-        </div>
+      {/* Building Layout */}
+      <div className="space-y-8">
+        {Array.from({ length: floors }, (_, i) => floors - i).map(floorNumber => 
+          renderFloor(floorNumber)
+        )}
       </div>
 
       {/* Room Details Modal */}
-      <Dialog open={!!selectedRoom} onOpenChange={() => setSelectedRoom(null)}>
-        <DialogContent className="max-w-md">
+      <Dialog open={showRoomModal} onOpenChange={setShowRoomModal}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Room {selectedRoom?.number}
+              <Bed className="h-5 w-5" />
+              Room {selectedRoom?.number} Details
             </DialogTitle>
           </DialogHeader>
-
+          
           {selectedRoom && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Room Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-muted rounded-lg">
-                  <IndianRupee className="h-5 w-5 mx-auto mb-1 text-primary" />
-                  <div className="font-bold">₹{selectedRoom.rent.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground">Monthly Rent</div>
+              <Card className="p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">Floor {selectedRoom.floor}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4 text-green-600" />
+                    <span className="font-semibold">₹{selectedRoom.price.toLocaleString()}/month</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm">Capacity: {selectedRoom.capacity}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-orange-600" />
+                    <span className="text-sm">Occupied: {selectedRoom.occupied}</span>
+                  </div>
                 </div>
-                <div className="text-center p-3 bg-muted rounded-lg">
-                  <Users className="h-5 w-5 mx-auto mb-1 text-primary" />
-                  <div className="font-bold">{selectedRoom.occupied}/{selectedRoom.capacity}</div>
-                  <div className="text-xs text-muted-foreground">Occupancy</div>
-                </div>
-              </div>
+              </Card>
 
-              {/* Sharing Type */}
-              <Badge variant="outline" className="w-full justify-center py-2">
-                {selectedRoom.sharingType} Sharing
-              </Badge>
-
-              {/* Occupants */}
-              {selectedRoom.occupants.length > 0 && (
+              {/* Roommates */}
+              {selectedRoom.roommates.length > 0 ? (
                 <div>
-                  <h4 className="font-semibold mb-2">Current Occupants</h4>
-                  <div className="space-y-2">
-                    {selectedRoom.occupants.map((occupant, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 bg-muted rounded">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-bold">{occupant.name.charAt(0)}</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{occupant.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {occupant.college} • {occupant.year}
+                  <h3 className="text-lg font-semibold mb-3">Current Roommates</h3>
+                  <div className="space-y-3">
+                    {selectedRoom.roommates.map((roommate, index) => (
+                      <Card key={index} className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-semibold">{roommate.name}</h4>
+                            <p className="text-sm text-gray-600">{roommate.age} years • {roommate.course}</p>
+                            <p className="text-sm text-gray-600">{roommate.college}</p>
+                          </div>
+                          <div className="text-right text-sm">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Phone className="h-3 w-3" />
+                              <span>{roommate.phone}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>Joined: {roommate.joinDate}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </div>
-              )}
-
-              {/* Amenities */}
-              <div>
-                <h4 className="font-semibold mb-2">Room Amenities</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedRoom.amenities.map((amenity, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {amenity === "WiFi" && <Wifi className="h-3 w-3 mr-1" />}
-                      {amenity === "Parking" && <Car className="h-3 w-3 mr-1" />}
-                      {amenity === "Food" && <Utensils className="h-3 w-3 mr-1" />}
-                      {amenity === "CCTV" && <Shield className="h-3 w-3 mr-1" />}
-                      {amenity}
-                    </Badge>
-                  ))}
+              ) : (
+                <div className="text-center py-8">
+                  <Bed className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-600">No current roommates</p>
+                  <p className="text-sm text-gray-500">This room is available for booking</p>
                 </div>
-              </div>
+              )}
 
-              {/* Action Button */}
-              {getRoomStatus(selectedRoom) === 'available' && (
-                <Button className="w-full">
-                  Book This Room
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                {selectedRoom.status === 'available' && (
+                  <Button className="flex-1">Book This Room</Button>
+                )}
+                {selectedRoom.status === 'occupied' && selectedRoom.occupied < selectedRoom.capacity && (
+                  <Button className="flex-1">Join as Roommate</Button>
+                )}
+                <Button variant="outline" onClick={() => setShowRoomModal(false)}>
+                  Close
                 </Button>
-              )}
-              {getRoomStatus(selectedRoom) === 'partial' && (
-                <Button className="w-full" variant="outline">
-                  Join as Roommate
-                </Button>
-              )}
+              </div>
             </div>
           )}
         </DialogContent>
@@ -260,4 +371,4 @@ const BuildingVisualizer = ({ floors = 3, roomsPerFloor = 6 }: BuildingVisualize
   );
 };
 
-export default BuildingVisualizer;
+export default RedBusBuildingLayout;

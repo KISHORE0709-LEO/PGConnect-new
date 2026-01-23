@@ -70,6 +70,7 @@ const RegisterPG = () => {
   const [formData, setFormData] = useState({
     pgName: "",
     address: "",
+    city: "",
     pgType: "any",
     description: "",
     totalRooms: "",
@@ -144,7 +145,7 @@ const RegisterPG = () => {
         name: formData.pgName,
         description: formData.description,
         address: formData.address,
-        city: formData.address.split(',').pop()?.trim() || 'Bangalore',
+        city: formData.city || 'Bangalore',
         state: 'Karnataka',
         pincode: '560001',
         pgType: formData.pgType,
@@ -240,6 +241,9 @@ const RegisterPG = () => {
             <h1 className="text-2xl font-bold">PG<span className="text-primary">Connect</span></h1>
             <Badge variant="secondary">Register PG</Badge>
           </div>
+          <Button variant="outline" onClick={() => navigate('/owner/dashboard')}>
+            View Dashboard
+          </Button>
         </div>
       </header>
 
@@ -366,6 +370,24 @@ const RegisterPG = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="city">City</Label>
+                  <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Select city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bangalore">Bangalore</SelectItem>
+                      <SelectItem value="mumbai">Mumbai</SelectItem>
+                      <SelectItem value="delhi">Delhi</SelectItem>
+                      <SelectItem value="pune">Pune</SelectItem>
+                      <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                      <SelectItem value="chennai">Chennai</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
                   <Label htmlFor="monthlyRent">Price (Monthly Rent)</Label>
                   <Input
                     id="monthlyRent"

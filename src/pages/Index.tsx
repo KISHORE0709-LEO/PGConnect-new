@@ -28,7 +28,7 @@ const checkOwnerPGsAndRedirect = async (navigate: any) => {
     if (pgsSnapshot.empty) {
       navigate('/owner/register-pg');
     } else {
-      navigate('/owner-dashboard');
+      navigate('/owner/dashboard');
     }
   } catch (error) {
     console.error('Error checking owner PGs:', error);
@@ -40,9 +40,9 @@ const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, showSuccessMessage, showPGSuccessMessage, dismissSuccessMessage, dismissPGSuccessMessage } = useAuth();
 
-  const handleOwnerClick = () => {
+  const handleOwnerClick = async () => {
     if (isAuthenticated) {
-      navigate('/owner-dashboard');
+      await checkOwnerPGsAndRedirect(navigate);
     } else {
       navigate('/auth?role=owner');
     }

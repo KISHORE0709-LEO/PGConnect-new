@@ -36,10 +36,12 @@ import {
   Palette,
   ChevronRight,
   ChevronLeft,
-  Map
+  Map,
+  CreditCard
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import GooglePayBooking from "@/components/GooglePayBooking";
 import {
   Select,
   SelectContent,
@@ -71,6 +73,8 @@ const StudentDashboard = () => {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [showMapView, setShowMapView] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedPG, setSelectedPG] = useState(null);
   const [userPreferences, setUserPreferences] = useState({
     name: '',
     email: '',
@@ -856,9 +860,24 @@ const StudentDashboard = () => {
                             <div className="text-xs text-gray-500">
                               {pg.reviews} reviews • {pg.distance}km from college
                             </div>
-                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white px-4">
-                              View Details
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="text-xs px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPG(pg);
+                                  setShowBookingModal(true);
+                                }}
+                              >
+                                <CreditCard className="h-3 w-3 mr-1" />
+                                Book
+                              </Button>
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white px-4">
+                                View Details
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1513,6 +1532,22 @@ const StudentDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Google Pay Booking Modal */}
+      {selectedPG && (
+        <GooglePayBooking 
+          isOpen={showBookingModal}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedPG(null);
+          }}
+          pgData={{
+            name: selectedPG.name,
+            price: selectedPG.price,
+            location: selectedPG.location
+          }}
+        />
+      )}
     </div>
   );
 };

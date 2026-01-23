@@ -20,6 +20,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import RedBusBuildingLayout from "@/components/RedBusBuildingLayout";
 
 const OwnerPGDashboard = () => {
   const navigate = useNavigate();
@@ -133,7 +134,7 @@ const OwnerPGDashboard = () => {
       {/* Header */}
       <header className="bg-card border-b sticky top-0 z-50 backdrop-blur-lg bg-card/95">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/owner-dashboard')}>
+          <Button variant="ghost" onClick={() => navigate('/owner/dashboard')}>
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Dashboard
           </Button>
@@ -255,12 +256,12 @@ const OwnerPGDashboard = () => {
 
         {/* Building Layout Placeholder */}
         <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Building Layout</h2>
-          <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-            <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Interactive Layout Coming Soon</h3>
-            <p className="text-muted-foreground">Building visualization will be available in the next update</p>
-          </div>
+          <h2 className="text-2xl font-bold mb-4">Interactive Building Layout</h2>
+          <RedBusBuildingLayout 
+            pgId={pgId}
+            floors={Math.ceil(totalRooms / 12) || 3}
+            roomsPerFloor={12}
+          />
         </Card>
       </div>
     </div>

@@ -1,37 +1,50 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { useOwnerStatus } from '@/hooks/useOwnerStatus';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const OwnerRedirect = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isOwner, loading } = useOwnerStatus();
 
   useEffect(() => {
-    if (!loading && user) {
-      if (isOwner) {
-        // Returning owner - go to dashboard
+    const checkOwnerPGs = async () => {
+      try {
+        const { auth } = await import('@/config/firebase');
+        const currentUser = auth.currentUser;
+        
+        if (!currentUser) {
+          navigate('/auth?role=owner');
+          return;
+        }
+
+        const { collection, query, where, getDocs } = await import('firebase/firestore');
+        const { db } = await import('@/config/firebase');
+        
+        const pgsQuery = query(
+          collection(db, 'pgs'),
+          where('ownerId', '==', currentUser.uid)
+        );
+        const pgsSnapshot = await getDocs(pgsQuery);
+        
+        if (pgsSnapshot.empty) {
+          navigate('/owner/register-pg');
+        } else {
+          navigate('/owner/dashboard');
+        }
+      } catch (error) {
+        console.error('Error checking owner PGs:', error);
         navigate('/owner/dashboard');
-      } else {
-        // First-time owner - go to registration
-        navigate('/owner/register-pg');
       }
-    }
-  }, [loading, user, isOwner, navigate]);
+    };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    checkOwnerPGs();
+  }, [navigate, user]);
 
-  return null;
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
 };
 
 export default OwnerRedirect;

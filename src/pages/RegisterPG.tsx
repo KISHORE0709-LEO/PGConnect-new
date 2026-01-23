@@ -21,6 +21,43 @@ import {
 } from "@/components/ui/dialog";
 import FlexibleBuildingConfig from "@/components/FlexibleBuildingConfig";
 
+// Generate default room layout for new PGs
+const generateDefaultRoomLayout = (totalRooms: number, baseRent: number) => {
+  const rooms = [];
+  const floorsCount = Math.ceil(totalRooms / 6);
+  
+  for (let floor = 0; floor < floorsCount; floor++) {
+    const roomsInFloor = Math.min(6, totalRooms - (floor * 6));
+    
+    for (let room = 1; room <= roomsInFloor; room++) {
+      const roomNumber = `${floor + 1}${room.toString().padStart(2, '0')}`;
+      const capacity = Math.floor(Math.random() * 3) + 1;
+      const occupied = Math.floor(Math.random() * (capacity + 1));
+      const statusOptions = ['available', 'occupied', 'sold'];
+      const status = statusOptions[Math.floor(Math.random() * statusOptions.length)];
+      
+      rooms.push({
+        id: roomNumber,
+        number: roomNumber,
+        floorId: floor,
+        rent: baseRent + (Math.floor(Math.random() * 4) * 100) - 200,
+        capacity,
+        occupied: status === 'available' ? 0 : occupied,
+        status,
+        occupants: Array.from({ length: status === 'available' ? 0 : occupied }, (_, k) => ({
+          name: `Student ${k + 1}`,
+          college: ["RVCE", "PESIT", "Christ", "IIT", "IISc"][Math.floor(Math.random() * 5)],
+          year: ["1st Year", "2nd Year", "3rd Year", "4th Year"][Math.floor(Math.random() * 4)]
+        })),
+        amenities: ["WiFi", "AC", "Attached Bathroom", "Balcony"].slice(0, Math.floor(Math.random() * 4) + 1),
+        sharingType: capacity === 1 ? "Single" : capacity === 2 ? "Double" : "Triple"
+      });
+    }
+  }
+  
+  return rooms;
+};
+
 const RegisterPG = () => {
   const navigate = useNavigate();
   const { user, setPGRegistrationSuccess } = useAuth();
@@ -94,6 +131,15 @@ const RegisterPG = () => {
         return;
       }
 
+      // Get Firebase user UID
+      const { auth } = await import('@/config/firebase');
+      const currentUser = auth.currentUser;
+      
+      if (!currentUser) {
+        toast.error('Please login to register PG');
+        return;
+      }
+
       const pgData = {
         name: formData.pgName,
         description: formData.description,
@@ -113,10 +159,16 @@ const RegisterPG = () => {
         smokingAllowed: formData.smokingAllowed,
         drinkingAllowed: formData.drinkingAllowed,
         availability: formData.availability,
-        ownerId: user.id || 'unknown',
-        ownerName: user.name || (user as any).displayName || user.email || 'Unknown',
-        ownerEmail: user.email || '',
+        ownerId: currentUser.uid, // Use Firebase UID
+        ownerName: user.name || currentUser.displayName || user.email || 'Unknown',
+        ownerEmail: user.email || currentUser.email || '',
         ownerPhone: user.phone || '',
+        // Add building layout data
+        buildingLayout: {
+          floors: Math.ceil(parseInt(formData.totalRooms) / 6) || 2,
+          roomsPerFloor: 6,
+          rooms: generateDefaultRoomLayout(parseInt(formData.totalRooms) || 12, parseInt(formData.monthlyRent) || 8500)
+        },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         status: 'active'

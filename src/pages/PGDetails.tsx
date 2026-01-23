@@ -20,6 +20,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import BuildingVisualizer from "@/components/BuildingVisualizer";
 import PGLocationMap from "@/components/PGLocationMap";
+import GooglePayBooking from "@/components/GooglePayBooking";
 
 // Mock detailed PG data
 const pgDetails = {
@@ -56,6 +57,7 @@ const PGDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [pgData, setPgData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     const fetchPGDetails = async () => {
@@ -234,6 +236,7 @@ const PGDetails = () => {
                   <BuildingVisualizer 
                     floors={displayData.floors} 
                     roomsPerFloor={displayData.roomsPerFloor}
+                    pgId={id}
                   />
                 </Card>
               </TabsContent>
@@ -265,7 +268,7 @@ const PGDetails = () => {
                 <span className="text-sm text-muted-foreground font-normal ml-2">/month</span>
               </div>
 
-              <Button size="lg" className="w-full mb-3">
+              <Button size="lg" className="w-full mb-3" onClick={() => setShowBookingModal(true)}>
                 Book Now
               </Button>
               <Button size="lg" variant="outline" className="w-full">
@@ -294,6 +297,17 @@ const PGDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Google Pay Booking Modal */}
+      <GooglePayBooking 
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        pgData={{
+          name: displayData.name,
+          price: displayData.price,
+          location: displayData.location
+        }}
+      />
     </div>
   );
 };

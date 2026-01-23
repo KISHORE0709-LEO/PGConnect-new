@@ -11,6 +11,29 @@ import { validatePassword, validateEmail } from "@/lib/validation";
 import PasswordInput from "@/components/PasswordInput";
 import Spline from '@splinetool/react-spline';
 
+// Helper function to check owner PGs and redirect
+const checkOwnerPGsAndRedirect = async (userId: string, navigate: any) => {
+  try {
+    const { collection, query, where, getDocs } = await import('firebase/firestore');
+    const { db } = await import('@/config/firebase');
+    
+    const pgsQuery = query(
+      collection(db, 'pgs'),
+      where('ownerId', '==', userId)
+    );
+    const pgsSnapshot = await getDocs(pgsQuery);
+    
+    if (pgsSnapshot.empty) {
+      navigate('/owner/register-pg');
+    } else {
+      navigate('/owner-dashboard');
+    }
+  } catch (error) {
+    console.error('Error checking owner PGs:', error);
+    navigate('/owner-dashboard');
+  }
+};
+
 const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -42,7 +65,6 @@ const Auth = () => {
   const handleEmailLogin = async () => {
     setLoading(true);
     try {
-      // Validate email
       const emailValidation = validateEmail(formData.email);
       if (!emailValidation.isValid) {
         showMessage('error', emailValidation.error!);
@@ -101,7 +123,6 @@ const Auth = () => {
   const handleRegister = async () => {
     setLoading(true);
     try {
-      // Validate inputs
       if (!formData.fullName.trim()) {
         showMessage('error', 'Please enter your full name');
         return;

@@ -5,7 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, Users, IndianRupee, MapPin, Wifi, Car, Utensils, Shield, Zap, Shirt, Wind, Camera } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import SimpleBuildingView from "@/components/SimpleBuildingView";
+import BuildingVisualizer from "@/components/BuildingVisualizer";
 import Footer from "@/components/Footer";
+import { db } from "@/config/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const PGManagement = () => {
   const navigate = useNavigate();
@@ -14,27 +17,47 @@ const PGManagement = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set data immediately without Firebase
-    setPgData({
-      id: pgId,
-      name: "Zolo Calista",
-      description: "Discover Zolo Calista, your ideal PG near Manyata Tech Park. Strategically located to offer convenience and comfort, our premium accommodation is designed for modern professionals like you. Situated just 2 km away from Manyata Tech Park, Zolo Calista ensures a quick and hassle-free commute, saving you valuable time every day. Enjoy easy access to key amenities: Flyover Pub: A mere 1.2 km away, perfect for unwinding after a busy day. Esteem Mall: Also 1.2 km away, offering shopping, dining, and entertainment options. D Mart: Just 0.6 km away, providing convenient shopping for your daily needs. At Zolo Calista, we prioritize your convenience and comfort, offering well-furnished rooms, hygienic living spaces, high-speed internet, nutritious food options, and round-the-clock security. Whether you're a working professional or a student, our PG near Manyata Tech Park is tailored to meet your needs. Experience the Zolo difference today. Book your stay at Zolo Calista and elevate your living experience near Manyata Tech Park.",
-      address: "3rd Cross Road, Vinayaka Layout, Coffee Board Layout, Hebbal Kempapura, Bengaluru, Karnataka 560024",
-      pgType: "any",
-      monthlyRent: 5000,
-      nearestCollege: "RVCE",
-      distance: 5,
-      amenities: ["WiFi"],
-      totalRooms: 12,
-      occupiedRooms: 9,
-      availableRooms: 3,
-      availability: "open",
-      gateOpening: "05:00",
-      gateClosing: "11:00",
-      smokingAllowed: false,
-      drinkingAllowed: false
-    });
-    setLoading(false);
+    const fetchPGData = async () => {
+      try {
+        if (!pgId) {
+          setLoading(false);
+          return;
+        }
+        
+        const pgDocRef = doc(db, 'pgs', pgId);
+        const pgDocSnap = await getDoc(pgDocRef);
+        
+        if (pgDocSnap.exists()) {
+          const data = pgDocSnap.data();
+          setPgData({
+            id: pgDocSnap.id,
+            name: data.name,
+            description: data.description,
+            address: data.address,
+            pgType: data.pgType,
+            monthlyRent: data.monthlyRent,
+            nearestCollege: data.nearestCollege,
+            distance: data.distance,
+            amenities: data.amenities || [],
+            totalRooms: data.totalRooms,
+            occupiedRooms: (data.totalRooms || 0) - (data.availableRooms || 0),
+            availableRooms: data.availableRooms,
+            availability: data.availability,
+            gateOpening: data.gateOpening,
+            gateClosing: data.gateClosing,
+            smokingAllowed: data.smokingAllowed,
+            drinkingAllowed: data.drinkingAllowed,
+            buildingLayout: data.buildingLayout
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPGData();
   }, [pgId]);
 
   const getAmenityIcon = (amenity) => {
@@ -52,11 +75,22 @@ const PGManagement = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   if (!pgData) {
-    return <div className="min-h-screen flex items-center justify-center">PG not found</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-4">Loading PG data...</h2>
+          <Button onClick={() => navigate('/owner-dashboard')}>Back to Dashboard</Button>
+        </div>
+      </div>
+    );
   }
 
   const occupancyRate = pgData.totalRooms > 0 ? Math.round((pgData.occupiedRooms / pgData.totalRooms) * 100) : 0;
@@ -182,7 +216,11 @@ const PGManagement = () => {
         {/* Building Layout */}
         <Card className="p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6">Building Layout</h2>
-          <SimpleBuildingView numFloors={3} roomsPerFloor={4} />
+          <BuildingVisualizer 
+            pgId={pgId}
+            floors={Math.ceil((pgData.totalRooms || 12) / 6)}
+            roomsPerFloor={6}
+          />
         </Card>
 
         {/* Action Buttons */}

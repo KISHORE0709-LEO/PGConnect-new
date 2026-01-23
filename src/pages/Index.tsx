@@ -5,13 +5,44 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import heroBg from "@/assets/hero-bg-realistic.jpg";
 
+// Helper function to check owner PGs and redirect
+const checkOwnerPGsAndRedirect = async (navigate: any) => {
+  try {
+    const { auth } = await import('@/config/firebase');
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+      navigate('/auth?role=owner');
+      return;
+    }
+
+    const { collection, query, where, getDocs } = await import('firebase/firestore');
+    const { db } = await import('@/config/firebase');
+    
+    const pgsQuery = query(
+      collection(db, 'pgs'),
+      where('ownerId', '==', currentUser.uid)
+    );
+    const pgsSnapshot = await getDocs(pgsQuery);
+    
+    if (pgsSnapshot.empty) {
+      navigate('/owner/register-pg');
+    } else {
+      navigate('/owner-dashboard');
+    }
+  } catch (error) {
+    console.error('Error checking owner PGs:', error);
+    navigate('/owner-dashboard');
+  }
+};
+
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, showSuccessMessage, showPGSuccessMessage, dismissSuccessMessage, dismissPGSuccessMessage } = useAuth();
 
   const handleOwnerClick = () => {
     if (isAuthenticated) {
-      navigate('/owner/register-pg');
+      checkOwnerPGsAndRedirect(navigate);
     } else {
       navigate('/auth?role=owner');
     }

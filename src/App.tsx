@@ -3,8 +3,10 @@ import { AuthProvider } from "./context/AuthContext";
 import Intro from "./pages/Intro";
 import Index from "./pages/Index";
 import StudentDashboard from "./pages/StudentDashboard";
+import CitySelection from "./pages/CitySelection";
 import PGDetails from "./pages/PGDetails";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import OwnerRedirect from "./pages/OwnerRedirect";
 import OwnerPGDashboard from "./pages/OwnerPGDashboard";
 import PGManagement from "./pages/PGManagement";
 import ImportData from "./pages/ImportData";
@@ -43,6 +45,7 @@ const App = () => (
           <Route path="/" element={<Navigate to="/intro" replace />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/city-selection" element={<CitySelection />} />
           <Route path="/student-dashboard" element={
             <>
               <Navbar />
@@ -50,13 +53,8 @@ const App = () => (
               <Footer />
             </>
           } />
-          <Route path="/owner-dashboard" element={
-            <>
-              <Navbar />
-              <div className="flex-1"><OwnerDashboard /></div>
-              <Footer />
-            </>
-          } />
+          <Route path="/owner-dashboard" element={<OwnerRedirect />} />
+          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/pg/:id" element={
             <>

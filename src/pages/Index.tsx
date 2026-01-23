@@ -42,7 +42,7 @@ const Index = () => {
 
   const handleOwnerClick = () => {
     if (isAuthenticated) {
-      checkOwnerPGsAndRedirect(navigate);
+      navigate('/owner-dashboard');
     } else {
       navigate('/auth?role=owner');
     }
@@ -50,7 +50,7 @@ const Index = () => {
 
   const handleStudentClick = () => {
     if (isAuthenticated) {
-      navigate('/student');
+      navigate('/city-selection');
     } else {
       navigate('/auth?role=student');
     }

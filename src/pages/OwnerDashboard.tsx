@@ -301,13 +301,6 @@ const OwnerDashboard = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold">Your Properties</h3>
-              <Button
-                onClick={() => navigate('/owner/register-pg')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Building
-              </Button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -636,15 +629,19 @@ const OwnerDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-blue-600 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-blue-600 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="flex items-center justify-between h-16 px-6 bg-blue-700">
-          <h1 className="text-xl font-bold text-white">
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            className="text-white hover:text-white font-bold text-xl p-0"
+          >
             PGConnect
-          </h1>
+          </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="text-white"
+            className="text-white lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-5 w-5" />
@@ -709,29 +706,24 @@ const OwnerDashboard = () => {
       {/* Main Content */}
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white border-b h-16 flex items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <button
-              className="w-10 h-10 rounded-lg bg-blue-500 hover:bg-blue-600 flex items-center justify-center transition-colors"
+        <header className="bg-white border-b h-16 flex items-center justify-end px-6">
+          <div className="lg:hidden">
+            <Button
+              className="w-10 h-10 rounded-lg bg-blue-500 hover:bg-blue-600 flex items-center justify-center transition-colors mr-4"
               onClick={() => setSidebarOpen(true)}
             >
-              <div className="flex flex-col gap-1">
-                <div className="w-4 h-0.5 bg-white rounded"></div>
-                <div className="w-4 h-0.5 bg-white rounded"></div>
-                <div className="w-4 h-0.5 bg-white rounded"></div>
-              </div>
-            </button>
-            
-            <Button
-              onClick={() => navigate('/home')}
-              variant="ghost"
-              className="text-blue-600 hover:text-blue-700 font-bold text-xl"
-            >
-              PGConnect
+              <Menu className="h-5 w-5 text-white" />
             </Button>
           </div>
 
           <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate('/owner/register-pg')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Building
+            </Button>
 
             <div className="relative">
               <Button 

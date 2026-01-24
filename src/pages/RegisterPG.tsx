@@ -388,6 +388,7 @@ const RegisterPG = () => {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
+                <div>
                   <Label htmlFor="monthlyRent">Price (Monthly Rent)</Label>
                   <Input
                     id="monthlyRent"

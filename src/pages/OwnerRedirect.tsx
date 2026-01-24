@@ -27,7 +27,7 @@ const OwnerRedirect = () => {
         const pgsSnapshot = await getDocs(pgsQuery);
         
         if (pgsSnapshot.empty) {
-          navigate('/owner/register-pg');
+          navigate('/owner/dashboard');
         } else {
           navigate('/owner/dashboard');
         }

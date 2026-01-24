@@ -42,7 +42,7 @@ const App = () => (
               <Footer />
             </>
           } />
-          <Route path="/" element={<Navigate to="/intro" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/city-selection" element={<CitySelection />} />

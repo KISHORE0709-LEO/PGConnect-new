@@ -92,7 +92,11 @@ const Auth = () => {
       showMessage('success', 'Login successful! Redirecting...');
       
       setTimeout(() => {
-        navigate('/home');
+        if (userProfile?.role === 'owner' || userType === 'owner') {
+          navigate('/owner/dashboard');
+        } else {
+          navigate('/home');
+        }
       }, 1000);
       
     } catch (error: any) {
@@ -164,7 +168,11 @@ const Auth = () => {
       showMessage('success', 'Account created successfully! Redirecting...');
       
       setTimeout(() => {
-        navigate('/home');
+        if (userType === 'owner') {
+          navigate('/owner/dashboard');
+        } else {
+          navigate('/home');
+        }
       }, 1000);
       
     } catch (error: any) {
@@ -217,7 +225,11 @@ const Auth = () => {
       showMessage('success', 'Google sign-in successful! Redirecting...');
       
       setTimeout(() => {
-        navigate('/home');
+        if (userProfile?.role === 'owner' || userType === 'owner') {
+          navigate('/owner/dashboard');
+        } else {
+          navigate('/home');
+        }
       }, 1000);
       
     } catch (error: any) {

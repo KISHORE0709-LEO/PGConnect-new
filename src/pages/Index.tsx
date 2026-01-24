@@ -42,7 +42,7 @@ const Index = () => {
 
   const handleOwnerClick = async () => {
     if (isAuthenticated) {
-      await checkOwnerPGsAndRedirect(navigate);
+      navigate('/owner/dashboard');
     } else {
       navigate('/auth?role=owner');
     }

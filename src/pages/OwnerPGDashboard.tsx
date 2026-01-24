@@ -118,7 +118,7 @@ const OwnerPGDashboard = () => {
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-4">PG not found</h2>
-          <Button onClick={() => navigate('/owner-dashboard')}>Back to Dashboard</Button>
+          <Button onClick={() => navigate('/owner/dashboard')}>Back to Dashboard</Button>
         </div>
       </div>
     );

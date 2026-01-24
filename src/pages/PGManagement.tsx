@@ -216,8 +216,10 @@ const PGManagement = () => {
         {/* Building Layout */}
         <Card className="p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6">Building Layout</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Interactive view showing room availability across all floors
+          </p>
           <BuildingVisualizer 
-            pgId={pgId}
             floors={Math.ceil((pgData.totalRooms || 12) / 6)}
             roomsPerFloor={6}
           />

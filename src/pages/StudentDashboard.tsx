@@ -134,8 +134,9 @@ const StudentDashboard = () => {
 
         const genderMap = {
           'male': 'boys',
-          'female': 'girls',
-          'unisex': 'any'
+          'female': 'girls', 
+          'unisex': 'any',
+          'any': 'any'
         };
 
         const pgGender = genderMap[(data.pgType || 'any').toLowerCase()] || (data.pgType || 'any').toLowerCase();
@@ -162,7 +163,7 @@ const StudentDashboard = () => {
         firebasePGs.push({
           id: doc.id,
           name: data.name || 'Unnamed PG',
-          location: `${data.address || ''}, Bangalore`,
+          location: `${data.address || ''}, ${data.city || 'Bangalore'}`,
           price: data.monthlyRent || 8500,
           sharing: data.sharing || '2 Sharing',
           gender: pgGender,
@@ -173,7 +174,8 @@ const StudentDashboard = () => {
           distance: data.distance || 0,
           sharingTypes,
           reviews: data.reviews || 28,
-          image: data.images && data.images.length > 0 ? data.images[0] : placeholderImages[Math.floor(Math.random() * placeholderImages.length)]
+          image: data.images && data.images.length > 0 ? data.images[0] : placeholderImages[Math.floor(Math.random() * placeholderImages.length)],
+          buildingLayout: data.buildingLayout // Include building layout data
         });
         });
 

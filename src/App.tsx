@@ -77,6 +77,13 @@ const App = () => (
               <Footer />
             </>
           } />
+          <Route path="/owner/tenants/:id" element={
+            <>
+              <Navbar />
+              <div className="flex-1"><OwnerPGDashboard /></div>
+              <Footer />
+            </>
+          } />
           <Route path="/manage/pg/:id" element={<PGManagement />} />
           <Route path="/how-to-book" element={
             <>

@@ -198,7 +198,7 @@ const OwnerDashboard = () => {
           <div className="space-y-8">
             {/* Greeting Section */}
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Good Morning, Robo</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Hello, {user?.name || 'Owner'}</h2>
               <p className="text-gray-600 mb-2">Here's your property overview for today</p>
               <p className="text-sm text-gray-500">{getCurrentDate()}</p>
               <div className="mt-4">

@@ -234,8 +234,8 @@ const PGDetails = () => {
                     Interactive 3D view showing room availability across all floors
                   </p>
                   <BuildingVisualizer 
-                    floors={displayData.floors} 
-                    roomsPerFloor={displayData.roomsPerFloor}
+                    floors={pgData?.buildingLayout?.floors || displayData.floors} 
+                    roomsPerFloor={pgData?.buildingLayout?.roomsPerFloor || displayData.roomsPerFloor}
                     pgId={id}
                   />
                 </Card>

@@ -190,6 +190,10 @@ const RegisterPG = () => {
       markAsOwner();
       
       toast.success('PG registered successfully!');
+      
+      // Refresh the page or update state to show new PG in dashboard
+      window.location.reload();
+      
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Error registering PG:', error);
@@ -220,11 +224,11 @@ const RegisterPG = () => {
       }
       
       toast.success("Building configuration saved!");
-      navigate('/owner/dashboard');
+      window.location.href = '/owner/dashboard';
     } catch (error) {
       console.error('Error saving building config:', error);
       toast.success("Building configuration saved!");
-      navigate('/owner/dashboard');
+      window.location.href = '/owner/dashboard';
     }
   };
 

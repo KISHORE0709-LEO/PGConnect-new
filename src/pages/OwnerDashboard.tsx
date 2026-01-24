@@ -35,6 +35,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { db } from "@/config/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const ownerData = {
   name: "Rajesh Kumar",
@@ -129,8 +131,67 @@ const OwnerDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ownerData, setOwnerData] = useState({
+    totalPGs: 0,
+    totalRooms: 0,
+    occupiedRooms: 0,
+    totalTenants: 0,
+    totalRevenue: 0,
+    monthlyGrowth: 0,
+    pendingPayments: 0
+  });
+  const [pgs, setPgs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOwnerData = async () => {
+      if (!user) return;
+      
+      try {
+        const pgsQuery = query(
+          collection(db, 'pgs'),
+          where('ownerEmail', '==', user.email)
+        );
+        const pgsSnapshot = await getDocs(pgsQuery);
+        const pgsData = pgsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        setPgs(pgsData);
+        
+        // Calculate stats
+        const totalPGs = pgsData.length;
+        const totalRooms = pgsData.reduce((sum, pg) => sum + (pg.totalRooms || 0), 0);
+        const availableRooms = pgsData.reduce((sum, pg) => sum + (pg.availableRooms || 0), 0);
+        const occupiedRooms = totalRooms - availableRooms;
+        const totalRevenue = pgsData.reduce((sum, pg) => sum + ((pg.totalRooms - pg.availableRooms) * pg.monthlyRent || 0), 0);
+        
+        setOwnerData({
+          totalPGs,
+          totalRooms,
+          occupiedRooms,
+          totalTenants: occupiedRooms,
+          totalRevenue,
+          monthlyGrowth: 12.5,
+          pendingPayments: Math.floor(occupiedRooms * 0.1)
+        });
+      } catch (error) {
+        console.error('Error fetching owner data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwnerData();
+  }, [user]);
 
   const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case "overview":
         return (
@@ -237,7 +298,7 @@ const OwnerDashboard = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    {mockPGs.map((pg) => (
+                    {pgs.map((pg) => (
                       <div key={pg.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-4">
                           <div className="p-3 bg-blue-100 rounded-lg">
@@ -247,24 +308,22 @@ const OwnerDashboard = () => {
                             <h4 className="font-semibold">{pg.name}</h4>
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                               <MapPin className="h-3 w-3" />
-                              <span>{pg.location}</span>
-                              <span>•</span>
-                              <span>{pg.branch}</span>
+                              <span>{pg.address}</span>
                             </div>
                           </div>
                         </div>
                         
                         <div className="flex items-center gap-6">
                           <div className="text-center">
-                            <div className="font-bold">{pg.occupiedRooms}/{pg.totalRooms}</div>
+                            <div className="font-bold">{(pg.totalRooms - pg.availableRooms)}/{pg.totalRooms}</div>
                             <div className="text-xs text-gray-500">Occupancy</div>
                           </div>
                           <div className="text-center">
-                            <div className="font-bold text-green-600">₹{(pg.revenue/1000).toFixed(0)}K</div>
+                            <div className="font-bold text-green-600">₹{((pg.totalRooms - pg.availableRooms) * pg.monthlyRent / 1000).toFixed(0)}K</div>
                             <div className="text-xs text-gray-500">Revenue</div>
                           </div>
                           <Badge className="bg-green-100 text-green-700">
-                            {pg.status}
+                            Active
                           </Badge>
                         </div>
                       </div>
@@ -304,14 +363,14 @@ const OwnerDashboard = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {mockPGs.map((pg) => (
+              {pgs.map((pg) => (
                 <Card key={pg.id} className="p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border-0 shadow-sm">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h4 className="text-lg font-bold mb-1">{pg.name}</h4>
                       <div className="flex items-center gap-2 text-sm text-gray-500">
                         <MapPin className="h-3 w-3" />
-                        <span>{pg.location}</span>
+                        <span>{pg.address}</span>
                       </div>
                     </div>
                     <Button variant="ghost" size="sm">
@@ -325,11 +384,11 @@ const OwnerDashboard = () => {
                       <div className="text-xs text-gray-500">Total</div>
                     </div>
                     <div className="text-center p-2 bg-green-50 rounded">
-                      <div className="text-sm font-bold text-green-600">{pg.occupiedRooms}</div>
+                      <div className="text-sm font-bold text-green-600">{pg.totalRooms - pg.availableRooms}</div>
                       <div className="text-xs text-gray-500">Occupied</div>
                     </div>
                     <div className="text-center p-2 bg-red-50 rounded">
-                      <div className="text-sm font-bold text-red-600">{pg.totalRooms - pg.occupiedRooms}</div>
+                      <div className="text-sm font-bold text-red-600">{pg.availableRooms}</div>
                       <div className="text-xs text-gray-500">Vacant</div>
                     </div>
                   </div>
@@ -338,7 +397,7 @@ const OwnerDashboard = () => {
                     <Button 
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
                       variant="default"
-                      onClick={() => navigate(`/manage/pg/${pg.id}`)}
+                      onClick={() => navigate(`/owner/pg/${pg.id}`)}
                       size="sm"
                     >
                       View Building Layout
@@ -347,6 +406,7 @@ const OwnerDashboard = () => {
                       variant="outline" 
                       className="w-full"
                       size="sm"
+                      onClick={() => navigate(`/owner/tenants/${pg.id}`)}
                     >
                       Assign Tenant
                     </Button>
@@ -628,6 +688,15 @@ const OwnerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Add Building Button - Fixed Top Right */}
+      <button
+        onClick={() => navigate('/owner/register-pg')}
+        className="fixed top-4 right-4 z-50 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium shadow-lg"
+      >
+        <Plus className="h-4 w-4" />
+        Add Building
+      </button>
+
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-blue-600 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="flex items-center justify-between h-16 px-6 bg-blue-700">
@@ -705,61 +774,6 @@ const OwnerDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1">
-        {/* Header */}
-        <header className="bg-white border-b h-16 flex items-center justify-end px-6">
-          <div className="lg:hidden">
-            <Button
-              className="w-10 h-10 rounded-lg bg-blue-500 hover:bg-blue-600 flex items-center justify-center transition-colors mr-4"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-5 w-5 text-white" />
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => navigate('/owner/register-pg')}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Building
-            </Button>
-
-            <div className="relative">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="relative"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
-                <Bell className="h-4 w-4" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-              </Button>
-              {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50">
-                  <div className="p-4 border-b">
-                    <h3 className="font-semibold">Notifications</h3>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    {recentAlerts.map((alert) => (
-                      <div key={alert.id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded">
-                        <div className={`w-2 h-2 rounded-full mt-2 ${
-                          alert.priority === 'high' ? 'bg-red-500' : 
-                          alert.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}></div>
-                        <div>
-                          <p className="text-sm font-medium">{alert.message}</p>
-                          <p className="text-xs text-gray-500">{alert.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
         {/* Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto">

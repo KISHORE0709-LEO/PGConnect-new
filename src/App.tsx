@@ -54,13 +54,7 @@ const App = () => (
             </>
           } />
           <Route path="/owner-dashboard" element={<OwnerRedirect />} />
-          <Route path="/owner/dashboard" element={
-            <>
-              <Navbar />
-              <div className="flex-1"><OwnerDashboard /></div>
-              <Footer />
-            </>
-          } />
+          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/pg/:id" element={
             <>

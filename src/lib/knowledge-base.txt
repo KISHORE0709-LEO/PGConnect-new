@@ -1,0 +1,135 @@
+# PGConnect Knowledge Base
+
+## Project Overview
+PGConnect is a modern PG (Paying Guest) management platform connecting students with quality accommodations in Bangalore. Built with React 18, TypeScript, and modern web technologies.
+
+## Tech Stack
+- Frontend: React 18, TypeScript, Tailwind CSS, Vite
+- UI Components: Radix UI, Lucide React icons
+- Backend: Node.js, Express, PostgreSQL
+- Database: Firebase Firestore for real-time data
+- Authentication: Firebase Auth with Google OAuth
+- Payments: Google Pay integration
+- Maps: Google Maps API for location services
+
+## Key Features
+
+### For Students
+- Smart Search & Filters: Location, price, amenities, college proximity
+- Interactive Map View: GPS locations with nearby landmarks
+- AI Roommate Matching: 4-step compatibility algorithm
+- 3D Building Visualization: Room layouts and availability
+- Real-time Availability: Live updates on rooms and pricing
+- Secure Booking: Google Pay integration
+- College-specific Recommendations: NMIT, RVCE, IISc, BMSIT, RNSIT, GITAM
+
+### For PG Owners
+- Property Management: Multiple property support
+- Tenant Dashboard: Payment tracking, occupancy management
+- Building Visualizer: Interactive floor plans with color-coded status
+- Revenue Analytics: Income and occupancy monitoring
+- Automated Notifications: Payment reminders, booking alerts
+- Direct Communication: Call, email, WhatsApp integration
+
+## Pricing Structure
+- Budget Range: ₹5,000-8,000/month
+- Standard Range: ₹8,000-15,000/month
+- Premium Range: ₹15,000-25,000/month
+
+Location-wise:
+- Electronic City: ₹6,000-12,000
+- Koramangala: ₹10,000-20,000
+- Whitefield: ₹7,000-15,000
+- Jayanagar: ₹8,000-16,000
+- BTM Layout: ₹7,000-14,000
+
+## AI Roommate Matching Process
+1. Lifestyle Preferences: Food habits, sleep schedule, smoking/drinking
+2. Living Standards: Cleanliness (1-10), noise tolerance, social preferences
+3. Interests & Hobbies: Personal interests, personality type, study habits
+4. Additional Preferences: Sharing preference, guest policy, pet-friendly
+
+## Amenities Categories
+Common: WiFi, Power Backup, AC, Attached Bathrooms, Food, Laundry, Security, CCTV, Parking
+Premium: Gym, Recreation, Study Rooms, Housekeeping, 24/7 Security, Modern Furnishing
+
+## Booking Process
+1. Browse & Filter properties
+2. Contact owner (call/email/WhatsApp)
+3. Schedule property visit
+4. Secure booking with Google Pay
+5. Submit documents
+6. Receive confirmation
+7. Move-in support
+
+## Building Visualizer Features
+- Floor-by-floor visualization
+- Room occupancy display (e.g., 2/3 occupied)
+- Color-coded payment status:
+  * Green: All tenants paid
+  * Yellow: Partial payments
+  * Red: Rent pending
+  * Gray: Room vacant
+- Hover tooltips with tenant info
+- Click-to-manage functionality
+- Direct tenant communication
+
+## Target Colleges
+- NMIT (Nitte Meenakshi Institute of Technology)
+- RVCE (R.V. College of Engineering)
+- IISc (Indian Institute of Science)
+- BMSIT (BMS Institute of Technology)
+- RNSIT (RNS Institute of Technology)
+- GITAM University
+- Other major Bangalore institutions
+
+## How to Launch PG
+1. Sign up as PG Owner
+2. Add property details (location, amenities, pricing)
+3. Upload high-quality photos
+4. Configure building layout with visualizer
+5. Set room sharing options and availability
+6. Publish listing
+7. Manage tenants through dashboard
+
+## Login Process
+- Firebase Authentication
+- Google OAuth integration
+- Separate student and owner dashboards
+- Secure session management
+
+## Project Structure
+src/
+├── components/ (Reusable UI components)
+├── pages/ (Application routes)
+├── hooks/ (Custom React hooks)
+├── lib/ (Utility functions)
+├── context/ (React context providers)
+└── config/ (Configuration files)
+
+## Payment Integration
+- Google Pay primary method
+- UPI support
+- Bank transfer options
+- Security deposit: 1-2 months rent
+- Automated payment reminders
+
+## Real-time Features
+- Live room availability updates
+- Real-time tenant communication
+- Instant booking confirmations
+- Live payment status tracking
+- Synchronized data across devices
+
+## Mobile Responsiveness
+- Optimized for mobile, tablet, desktop
+- Touch-friendly interface
+- Progressive Web App capabilities
+- Offline functionality for basic features
+
+## Security Features
+- Firebase security rules
+- Encrypted data transmission
+- Secure payment processing
+- User verification system
+- Privacy protection measures

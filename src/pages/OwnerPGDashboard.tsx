@@ -20,7 +20,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import RedBusBuildingLayout from "@/components/RedBusBuildingLayout";
+import InteractiveBuildingLayout from "@/components/InteractiveBuildingLayout";
 
 const OwnerPGDashboard = () => {
   const navigate = useNavigate();
@@ -42,7 +42,8 @@ const OwnerPGDashboard = () => {
         if (docSnap.exists()) {
           setPgData({ id: docSnap.id, ...docSnap.data() });
         } else {
-          // Fallback data for demo
+          console.log('PG document not found, using fallback data');
+          // Use fallback data with building configuration
           setPgData({
             id: pgId,
             name: "Sample PG",
@@ -59,15 +60,29 @@ const OwnerPGDashboard = () => {
             gateClosing: "10:00 PM",
             smokingAllowed: false,
             drinkingAllowed: false,
-            availability: "open"
+            availability: "open",
+            buildingConfiguration: {
+              floors: [
+                {
+                  id: "1",
+                  number: 1,
+                  rooms: [
+                    { id: "101", number: "101", capacity: 2, occupied: 1, rent: 12000, pendingDues: 0, occupants: [{ name: "John Doe", college: "NMIT", dueAmount: 0 }] },
+                    { id: "102", number: "102", capacity: 3, occupied: 2, rent: 10000, pendingDues: 5000, occupants: [{ name: "Jane Smith", college: "RVCE", dueAmount: 2500 }] }
+                  ]
+                }
+              ],
+              totalFloors: 1,
+              totalRooms: 2
+            }
           });
         }
       } catch (error) {
         console.error('Error fetching PG:', error);
-        // Fallback data on error
+        // Enhanced fallback data on error
         setPgData({
           id: pgId,
-          name: "Sample PG",
+          name: "Demo PG",
           address: "123 Main Street, Bangalore",
           pgType: "any",
           monthlyRent: 12000,
@@ -81,7 +96,21 @@ const OwnerPGDashboard = () => {
           gateClosing: "10:00 PM",
           smokingAllowed: false,
           drinkingAllowed: false,
-          availability: "open"
+          availability: "open",
+          buildingConfiguration: {
+            floors: [
+              {
+                id: "1",
+                number: 1,
+                rooms: [
+                  { id: "101", number: "101", capacity: 2, occupied: 1, rent: 12000, pendingDues: 0, occupants: [{ name: "John Doe", college: "NMIT", dueAmount: 0 }] },
+                  { id: "102", number: "102", capacity: 3, occupied: 2, rent: 10000, pendingDues: 5000, occupants: [{ name: "Jane Smith", college: "RVCE", dueAmount: 2500 }] }
+                ]
+              }
+            ],
+            totalFloors: 1,
+            totalRooms: 2
+          }
         });
       } finally {
         setLoading(false);
@@ -254,15 +283,11 @@ const OwnerPGDashboard = () => {
           </div>
         </div>
 
-        {/* Building Layout Placeholder */}
-        <Card className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Interactive Building Layout</h2>
-          <RedBusBuildingLayout 
-            pgId={pgId}
-            floors={Math.ceil(totalRooms / 12) || 3}
-            roomsPerFloor={12}
-          />
-        </Card>
+        {/* Interactive Building Layout */}
+        <InteractiveBuildingLayout 
+          buildingConfig={pgData.buildingConfiguration}
+          pgName={pgData.name}
+        />
       </div>
     </div>
   );

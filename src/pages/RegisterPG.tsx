@@ -164,11 +164,11 @@ const RegisterPG = () => {
         ownerName: user.name || currentUser.displayName || user.email || 'Unknown',
         ownerEmail: user.email || currentUser.email || '',
         ownerPhone: user.phone || '',
-        // Add building layout data
-        buildingLayout: {
-          floors: Math.ceil(parseInt(formData.totalRooms) / 6) || 2,
-          roomsPerFloor: 6,
-          rooms: generateDefaultRoomLayout(parseInt(formData.totalRooms) || 12, parseInt(formData.monthlyRent) || 8500)
+        // Add building layout data with proper structure
+        buildingConfiguration: {
+          floors: [],
+          totalFloors: Math.ceil(parseInt(formData.totalRooms) / 6) || 2,
+          totalRooms: parseInt(formData.totalRooms) || 10
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -191,9 +191,13 @@ const RegisterPG = () => {
       
       toast.success('PG registered successfully!');
       
+<<<<<<< HEAD
       // Set registration success flag
       setPGRegistrationSuccess(true);
       
+=======
+      // Show success dialog instead of reloading
+>>>>>>> 2160d65e57fcf94a0a873942991a09ce0d746e33
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Error registering PG:', error);
@@ -209,23 +213,63 @@ const RegisterPG = () => {
     }, 100);
   };
 
-  const handleBuildingConfigSubmit = async () => {
+  const handleBuildingConfigSubmit = async (floors) => {
     try {
-      // Save building configuration to Firebase if needed
-      if (formData.buildingFloors && formData.buildingFloors.length > 0) {
-        const { db } = await import('@/config/firebase');
-        const { collection, addDoc } = await import('firebase/firestore');
+      if (!user) {
+        toast.error('Please login to save building configuration');
+        return;
+      }
+
+      // Get Firebase user UID
+      const { auth } = await import('@/config/firebase');
+      const currentUser = auth.currentUser;
+      
+      if (!currentUser) {
+        toast.error('Please login to save building configuration');
+        return;
+      }
+
+      // Save building configuration to Firebase
+      const { db } = await import('@/config/firebase');
+      const { collection, addDoc, query, where, getDocs, updateDoc, doc } = await import('firebase/firestore');
+      
+      // Find the PG document we just created
+      const pgsQuery = query(
+        collection(db, 'pgs'),
+        where('ownerEmail', '==', user.email || currentUser.email),
+        where('name', '==', formData.pgName)
+      );
+      const pgsSnapshot = await getDocs(pgsQuery);
+      
+      if (!pgsSnapshot.empty) {
+        // Update the existing PG document with building configuration
+        const pgDoc = pgsSnapshot.docs[0];
+        // Transform FlexibleBuildingConfig format to InteractiveBuildingLayout format
+        const transformedFloors = floors.map(floor => ({
+          ...floor,
+          rooms: floor.rooms.map(room => ({
+            ...room,
+            capacity: room.sharing,
+            occupied: Math.floor(Math.random() * room.sharing), // Random initial occupancy
+            pendingDues: 0,
+            occupants: []
+          }))
+        }));
         
-        const buildingData = {
-          pgName: formData.pgName,
-          ownerId: user?.id,
-          floors: formData.buildingFloors,
-          createdAt: new Date().toISOString()
-        };
+        await updateDoc(doc(db, 'pgs', pgDoc.id), {
+          buildingConfiguration: {
+            floors: transformedFloors,
+            totalFloors: floors.length,
+            totalRooms: floors.reduce((sum, floor) => sum + floor.rooms.length, 0),
+            configuredAt: new Date().toISOString()
+          },
+          updatedAt: new Date().toISOString()
+        });
         
-        await addDoc(collection(db, 'buildings'), buildingData);
+        console.log('Building configuration saved to PG document:', pgDoc.id);
       }
       
+<<<<<<< HEAD
       toast.success("Building configuration saved!");
       setShowBuildingConfig(false);
       navigate('/owner/dashboard');
@@ -234,6 +278,19 @@ const RegisterPG = () => {
       toast.success("Building configuration saved!");
       setShowBuildingConfig(false);
       navigate('/owner/dashboard');
+=======
+      toast.success("Building configuration saved successfully!");
+      setShowBuildingConfig(false);
+      
+      // Navigate to dashboard after successful save
+      setTimeout(() => {
+        navigate('/owner/dashboard');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error saving building config:', error);
+      toast.error('Failed to save building configuration');
+>>>>>>> 2160d65e57fcf94a0a873942991a09ce0d746e33
     }
   };
 
@@ -647,8 +704,7 @@ const RegisterPG = () => {
           <div className="py-4">
             <FlexibleBuildingConfig
               onSave={(floors) => {
-                handleInputChange('buildingFloors', floors);
-                handleBuildingConfigSubmit();
+                handleBuildingConfigSubmit(floors);
               }}
             />
           </div>

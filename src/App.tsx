@@ -28,6 +28,7 @@ import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
+import SplineChatbot from "./components/SplineChatbot";
 
 const App = () => (
   <AuthProvider>
@@ -179,6 +180,7 @@ const App = () => (
           } />
         </Routes>
       </div>
+      <SplineChatbot />
     </BrowserRouter>
   </AuthProvider>
 );

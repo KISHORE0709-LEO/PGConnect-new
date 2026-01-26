@@ -1,0 +1,142 @@
+PGCONNECT CHATBOT KNOWLEDGE BASE
+
+=== ABOUT PGCONNECT ===
+PGConnect is a modern PG (Paying Guest) management platform that connects students with quality accommodations. It's built using React 18, TypeScript, Tailwind CSS, and Firebase.
+
+=== FOR STUDENTS ===
+
+Q: How do I find a PG?
+A: Use our smart search and filters to find PGs by location, price, amenities, and preferences. You can also use the interactive map view to see GPS locations with nearby landmarks and transportation options.
+
+Q: How do I search for PGs?
+A: Go to the student dashboard and use the search bar with filters like location, price range, amenities (WiFi, AC, food, etc.), and room sharing preferences.
+
+Q: Can I find roommates?
+A: Yes! Use our AI roommate matching feature that finds compatible roommates based on your lifestyle preferences, study habits, and interests.
+
+Q: How do I view PG details?
+A: Click on any PG listing to see detailed information including photos, amenities, GPS location, room layouts, pricing, and availability.
+
+Q: How do I book a room?
+A: After viewing PG details, click "Book Room" to contact the owner directly. You'll get their contact information for further discussion.
+
+Q: Can I see room layouts?
+A: Yes! We offer 3D building visualization where you can explore room layouts, floor plans, and check real-time availability.
+
+Q: How do I contact PG owners?
+A: Once you're interested in a PG, use the contact options provided - phone, email, or WhatsApp to reach the owner directly.
+
+=== FOR PG OWNERS ===
+
+Q: How do I list my PG?
+A: Go to "Launch as Owner", complete the registration process, then add your property with photos, amenities, location details, and pricing information.
+
+Q: How do I add my property?
+A: After owner registration, click "Add Property" and fill in details like PG name, address, photos, amenities, room types, pricing, and contact information.
+
+Q: How do I manage tenants?
+A: Use the tenant dashboard to track payments, occupancy, tenant details, and communicate with tenants through our integrated messaging system.
+
+Q: How do I set up my building layout?
+A: Navigate to your PG dashboard and click "Configure Building Layout". Set the number of floors and rooms per floor. The system will create rooms with sample data for demonstration.
+
+Q: How do I track rent payments?
+A: Use the Interactive Building Visualization feature. Rooms are color-coded: Green (all paid), Yellow (partial payment), Red (pending), Gray (vacant).
+
+Q: How do I add new tenants?
+A: Click on any room in the building visualization, then click "Add Tenant" to enter tenant details like name, email, phone, and rent amount.
+
+Q: How do I mark rent as received?
+A: In the building visualization, click on a room, find the tenant, and click "Mark Payment Received" when they pay rent.
+
+Q: How do I contact tenants for rent reminders?
+A: Click on any room, select a tenant, and use Call, Email, or WhatsApp options to send rent reminders with automated messages.
+
+Q: How do I view analytics?
+A: Access the revenue analytics section in your dashboard to monitor income, occupancy rates, and property performance metrics.
+
+Q: How many tenants can I add per room?
+A: Currently, rooms support triple sharing (3 tenants per room), but this is configurable based on your property setup.
+
+=== TECHNICAL FEATURES ===
+
+Q: Is PGConnect mobile-friendly?
+A: Yes! PGConnect has a responsive design optimized for mobile, tablet, and desktop devices.
+
+Q: How do I get real-time updates?
+A: The platform provides live data synchronization, so you'll see real-time updates on room availability, bookings, and tenant information.
+
+Q: Is my data secure?
+A: Yes! We use Firebase-based secure authentication and follow industry-standard security practices to protect your data.
+
+Q: What browsers are supported?
+A: PGConnect works on all modern browsers including Chrome, Firefox, Safari, and Edge.
+
+=== BUILDING VISUALIZATION FEATURE ===
+
+Q: What is the Interactive Building Visualization?
+A: It's a visual, interactive way for PG owners to manage their property, tenants, and rent collection through an intuitive building layout interface.
+
+Q: How do room colors work?
+A: Green = All tenants paid rent, Yellow = Some tenants paid (partial), Red = No tenants paid, Gray = Room is vacant.
+
+Q: How do I configure my building?
+A: Set number of floors (1-10) and rooms per floor (1-20). The system creates a visual layout you can interact with.
+
+Q: Can I see tenant details quickly?
+A: Yes! Hover over rooms to see quick tenant info and payment status, or click for detailed information.
+
+=== GETTING STARTED ===
+
+Q: How do I sign up as a student?
+A: Click "Sign Up" and select "Student" to create your account. You can then start browsing available PGs immediately.
+
+Q: How do I sign up as an owner?
+A: Click "Launch as Owner" and complete the registration process. You'll then be able to list your properties and manage tenants.
+
+Q: Is there a mobile app?
+A: Currently, PGConnect is a web-based platform accessible through any mobile browser. A dedicated mobile app may be available in the future.
+
+Q: How do I reset my password?
+A: Click "Forgot Password" on the login page and follow the instructions sent to your registered email.
+
+Q: How do I update my profile?
+A: Go to your dashboard and click on "Profile Settings" to update your personal information, contact details, and preferences.
+
+=== PRICING AND PAYMENTS ===
+
+Q: Is PGConnect free to use?
+A: Students can browse and search for free. PG owners may have different pricing tiers for listing properties and accessing premium features.
+
+Q: How do rent payments work?
+A: PGConnect facilitates communication between students and owners. Actual rent payments are handled directly between tenants and PG owners.
+
+Q: Can I negotiate rent?
+A: Yes! Contact the PG owner directly through our platform to discuss pricing and negotiate terms.
+
+=== SUPPORT ===
+
+Q: How do I get help?
+A: Contact our support team through the help section in your dashboard, or use the chat support feature available on the platform.
+
+Q: How do I report issues?
+A: Use the "Report Issue" feature in your dashboard or contact support directly with details about any problems you encounter.
+
+Q: Can I provide feedback?
+A: Yes! We welcome feedback through the feedback section in your dashboard to help us improve the platform.
+
+=== COMMON ISSUES ===
+
+Q: I can't find PGs in my area
+A: Try expanding your search radius, adjusting filters, or contact support to help add more properties in your preferred location.
+
+Q: My property isn't getting enough visibility
+A: Ensure you've added high-quality photos, detailed descriptions, competitive pricing, and all relevant amenities to attract more students.
+
+Q: I'm having trouble with the building visualization
+A: Make sure you've configured your building layout properly. If issues persist, contact support for assistance.
+
+Q: The map isn't loading
+A: Check your internet connection and browser permissions for location access. Try refreshing the page or clearing your browser cache.
+
+This knowledge base covers the main features and common questions about PGConnect. The chatbot should be able to answer most user queries using this information.

@@ -191,8 +191,8 @@ const RegisterPG = () => {
       
       toast.success('PG registered successfully!');
       
-      // Refresh the page or update state to show new PG in dashboard
-      window.location.reload();
+      // Set registration success flag
+      setPGRegistrationSuccess(true);
       
       setShowSuccessDialog(true);
     } catch (error) {
@@ -203,7 +203,10 @@ const RegisterPG = () => {
 
   const handleContinueToBuildingConfig = () => {
     setShowSuccessDialog(false);
-    setShowBuildingConfig(true);
+    // Small delay to ensure dialog closes before opening the next one
+    setTimeout(() => {
+      setShowBuildingConfig(true);
+    }, 100);
   };
 
   const handleBuildingConfigSubmit = async () => {
@@ -224,11 +227,13 @@ const RegisterPG = () => {
       }
       
       toast.success("Building configuration saved!");
-      window.location.href = '/owner/dashboard';
+      setShowBuildingConfig(false);
+      navigate('/owner/dashboard');
     } catch (error) {
       console.error('Error saving building config:', error);
       toast.success("Building configuration saved!");
-      window.location.href = '/owner/dashboard';
+      setShowBuildingConfig(false);
+      navigate('/owner/dashboard');
     }
   };
 
@@ -597,22 +602,35 @@ const RegisterPG = () => {
 
       {/* Success Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <div className="mx-auto w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-4">
               <CheckCircle2 className="h-8 w-8 text-success" />
             </div>
-            <DialogTitle className="text-center text-2xl">
+            <DialogTitle className="text-center text-xl">
               "{formData.pgName || 'Your PG'}" has been registered!
             </DialogTitle>
-            <DialogDescription className="text-center">
+            <DialogDescription className="text-center text-sm">
               Congratulations! Your PG listing has been created successfully. Now let's configure your building layout.
             </DialogDescription>
           </DialogHeader>
-          <Button onClick={handleContinueToBuildingConfig} size="lg" className="w-full">
-            Continue to Building Setup
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button onClick={handleContinueToBuildingConfig} size="lg" className="w-full">
+              Continue to Building Setup
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowSuccessDialog(false);
+                navigate('/owner/dashboard');
+              }} 
+              variant="outline" 
+              size="lg" 
+              className="w-full"
+            >
+              Skip for Now
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 

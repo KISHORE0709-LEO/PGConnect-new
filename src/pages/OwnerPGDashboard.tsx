@@ -36,82 +36,41 @@ const OwnerPGDashboard = () => {
       }
       
       try {
+        // First try to get by document ID
         const docRef = doc(db, 'pgs', pgId);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
           setPgData({ id: docSnap.id, ...docSnap.data() });
         } else {
-          console.log('PG document not found, using fallback data');
-          // Use fallback data with building configuration
-          setPgData({
-            id: pgId,
-            name: "Sample PG",
-            address: "123 Main Street, Bangalore",
-            pgType: "any",
-            monthlyRent: 12000,
-            nearestCollege: "NMIT",
-            distance: 2.5,
-            amenities: ["WiFi", "AC", "Food Included", "Laundry"],
-            totalRooms: 12,
-            availableRooms: 5,
-            description: "A comfortable PG with modern amenities",
-            gateOpening: "6:00 AM",
-            gateClosing: "10:00 PM",
-            smokingAllowed: false,
-            drinkingAllowed: false,
-            availability: "open",
-            buildingConfiguration: {
-              floors: [
-                {
-                  id: "1",
-                  number: 1,
-                  rooms: [
-                    { id: "101", number: "101", capacity: 2, occupied: 1, rent: 12000, pendingDues: 0, occupants: [{ name: "John Doe", college: "NMIT", dueAmount: 0 }] },
-                    { id: "102", number: "102", capacity: 3, occupied: 2, rent: 10000, pendingDues: 5000, occupants: [{ name: "Jane Smith", college: "RVCE", dueAmount: 2500 }] }
-                  ]
-                }
-              ],
-              totalFloors: 1,
-              totalRooms: 2
+          // If not found by ID, try to find by owner email (for newly created PGs)
+          const { auth } = await import('@/config/firebase');
+          const { collection, query, where, getDocs } = await import('firebase/firestore');
+          const currentUser = auth.currentUser;
+          
+          if (currentUser) {
+            const pgsQuery = query(
+              collection(db, 'pgs'),
+              where('ownerEmail', '==', currentUser.email)
+            );
+            const pgsSnapshot = await getDocs(pgsQuery);
+            
+            if (!pgsSnapshot.empty) {
+              // Get the first PG (or the one matching the ID)
+              const pgDoc = pgsSnapshot.docs.find(doc => doc.id === pgId) || pgsSnapshot.docs[0];
+              setPgData({ id: pgDoc.id, ...pgDoc.data() });
+            } else {
+              console.log('No PG found for this owner');
+              setPgData(null);
             }
-          });
+          } else {
+            console.log('No authenticated user');
+            setPgData(null);
+          }
         }
       } catch (error) {
         console.error('Error fetching PG:', error);
-        // Enhanced fallback data on error
-        setPgData({
-          id: pgId,
-          name: "Demo PG",
-          address: "123 Main Street, Bangalore",
-          pgType: "any",
-          monthlyRent: 12000,
-          nearestCollege: "NMIT",
-          distance: 2.5,
-          amenities: ["WiFi", "AC", "Food Included", "Laundry"],
-          totalRooms: 12,
-          availableRooms: 5,
-          description: "A comfortable PG with modern amenities",
-          gateOpening: "6:00 AM",
-          gateClosing: "10:00 PM",
-          smokingAllowed: false,
-          drinkingAllowed: false,
-          availability: "open",
-          buildingConfiguration: {
-            floors: [
-              {
-                id: "1",
-                number: 1,
-                rooms: [
-                  { id: "101", number: "101", capacity: 2, occupied: 1, rent: 12000, pendingDues: 0, occupants: [{ name: "John Doe", college: "NMIT", dueAmount: 0 }] },
-                  { id: "102", number: "102", capacity: 3, occupied: 2, rent: 10000, pendingDues: 5000, occupants: [{ name: "Jane Smith", college: "RVCE", dueAmount: 2500 }] }
-                ]
-              }
-            ],
-            totalFloors: 1,
-            totalRooms: 2
-          }
-        });
+        setPgData(null);
       } finally {
         setLoading(false);
       }
@@ -146,7 +105,8 @@ const OwnerPGDashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold mb-4">PG not found</h2>
+          <h2 className="text-xl font-bold mb-4">No PG data available</h2>
+          <p className="text-muted-foreground mb-4">Please register a PG first or check your connection.</p>
           <Button onClick={() => navigate('/owner/dashboard')}>Back to Dashboard</Button>
         </div>
       </div>

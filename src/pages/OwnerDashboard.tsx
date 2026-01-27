@@ -37,6 +37,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { db } from "@/config/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const ownerData = {
   name: "Rajesh Kumar",
@@ -142,6 +157,8 @@ const OwnerDashboard = () => {
   });
   const [pgs, setPgs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [pgToDelete, setPgToDelete] = useState(null);
 
   useEffect(() => {
     const fetchOwnerData = async () => {
@@ -182,6 +199,24 @@ const OwnerDashboard = () => {
 
     fetchOwnerData();
   }, [user]);
+
+  const handleDeletePG = async (pgId, pgName) => {
+    try {
+      const { db } = await import('@/config/firebase');
+      const { doc, deleteDoc } = await import('firebase/firestore');
+      
+      await deleteDoc(doc(db, 'pgs', pgId));
+      
+      setPgs(pgs.filter(pg => pg.id !== pgId));
+      
+      toast.success(`${pgName} deleted successfully`);
+      setDeleteConfirmOpen(false);
+      setPgToDelete(null);
+    } catch (error) {
+      console.error('Error deleting PG:', error);
+      toast.error('Failed to delete PG');
+    }
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -373,9 +408,24 @@ const OwnerDashboard = () => {
                         <span>{pg.address}</span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem 
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => {
+                            setPgToDelete(pg);
+                            setDeleteConfirmOpen(true);
+                          }}
+                        >
+                          Delete Property
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 mb-4">
@@ -781,6 +831,29 @@ const OwnerDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Property</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{pgToDelete?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => handleDeletePG(pgToDelete?.id, pgToDelete?.name)}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

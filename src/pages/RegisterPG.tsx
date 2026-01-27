@@ -190,14 +190,13 @@ const RegisterPG = () => {
       markAsOwner();
       
       toast.success('PG registered successfully!');
-      
-<<<<<<< HEAD
+       
       // Set registration success flag
       setPGRegistrationSuccess(true);
       
-=======
+
       // Show success dialog instead of reloading
->>>>>>> 2160d65e57fcf94a0a873942991a09ce0d746e33
+
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Error registering PG:', error);
@@ -269,28 +268,13 @@ const RegisterPG = () => {
         console.log('Building configuration saved to PG document:', pgDoc.id);
       }
       
-<<<<<<< HEAD
+
       toast.success("Building configuration saved!");
       setShowBuildingConfig(false);
       navigate('/owner/dashboard');
-    } catch (error) {
-      console.error('Error saving building config:', error);
-      toast.success("Building configuration saved!");
-      setShowBuildingConfig(false);
-      navigate('/owner/dashboard');
-=======
-      toast.success("Building configuration saved successfully!");
-      setShowBuildingConfig(false);
-      
-      // Navigate to dashboard after successful save
-      setTimeout(() => {
-        navigate('/owner/dashboard');
-      }, 1000);
-      
     } catch (error) {
       console.error('Error saving building config:', error);
       toast.error('Failed to save building configuration');
->>>>>>> 2160d65e57fcf94a0a873942991a09ce0d746e33
     }
   };
 

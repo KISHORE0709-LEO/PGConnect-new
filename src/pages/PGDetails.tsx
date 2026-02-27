@@ -237,6 +237,7 @@ const PGDetails = () => {
                     floors={pgData?.buildingLayout?.floors || displayData.floors} 
                     roomsPerFloor={pgData?.buildingLayout?.roomsPerFloor || displayData.roomsPerFloor}
                     pgId={id}
+                    onBookRoom={() => setShowBookingModal(true)}
                   />
                 </Card>
               </TabsContent>

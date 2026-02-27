@@ -34,6 +34,7 @@ interface BuildingVisualizerProps {
   roomsPerFloor?: number;
   pgId?: string;
   buildingData?: any;
+  onBookRoom?: () => void;
 }
 
 // Generate building data similar to RedBus layout
@@ -75,7 +76,7 @@ const generateBuildingData = (numFloors: number, roomsPerFloor: number): Floor[]
   return floors;
 };
 
-const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId, buildingData: propBuildingData }: BuildingVisualizerProps) => {
+const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId, buildingData: propBuildingData, onBookRoom }: BuildingVisualizerProps) => {
   const [buildingData, setBuildingData] = useState<Floor[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
@@ -352,7 +353,10 @@ const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId, buildingData
                 </div>
               </div>
 
-              <Button className="w-full" size="lg">
+              <Button className="w-full" size="lg" onClick={() => {
+                setSelectedRoom(null);
+                onBookRoom?.();
+              }}>
                 Book Room {selectedRoom.number}
               </Button>
             </div>

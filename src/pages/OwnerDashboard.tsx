@@ -240,6 +240,8 @@ const OwnerDashboard = () => {
                 <input
                   type="text"
                   placeholder="Search properties..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-4 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
                 />
               </div>
@@ -247,7 +249,7 @@ const OwnerDashboard = () => {
             
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+              <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => setActiveTab("properties")}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white/20 rounded-lg">
                     <Building2 className="h-6 w-6" />
@@ -262,7 +264,7 @@ const OwnerDashboard = () => {
                 </div>
               </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+              <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => setActiveTab("tenants")}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white/20 rounded-lg">
                     <Users className="h-6 w-6" />
@@ -276,7 +278,7 @@ const OwnerDashboard = () => {
                 </div>
               </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+              <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => setActiveTab("analytics")}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white/20 rounded-lg">
                     <IndianRupee className="h-6 w-6" />
@@ -290,7 +292,7 @@ const OwnerDashboard = () => {
                 </div>
               </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-orange-500 to-red-500 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+              <Card className="p-6 bg-gradient-to-br from-orange-500 to-red-500 text-white hover:shadow-2xl hover:-translate-y-2 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => setActiveTab("payments")}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-white/20 rounded-lg">
                     <AlertCircle className="h-6 w-6" />
@@ -333,7 +335,10 @@ const OwnerDashboard = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    {pgs.map((pg) => (
+                    {pgs.filter(pg => 
+                      pg.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                      pg.address.toLowerCase().includes(searchQuery.toLowerCase())
+                    ).map((pg) => (
                       <div key={pg.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-4">
                           <div className="p-3 bg-blue-100 rounded-lg">
@@ -395,10 +400,19 @@ const OwnerDashboard = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold">Your Properties</h3>
+              <Input 
+                placeholder="Search properties..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64" 
+              />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {pgs.map((pg) => (
+              {pgs.filter(pg => 
+                pg.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                pg.address.toLowerCase().includes(searchQuery.toLowerCase())
+              ).map((pg) => (
                 <Card key={pg.id} className="p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border-0 shadow-sm">
                   <div className="flex items-start justify-between mb-4">
                     <div>

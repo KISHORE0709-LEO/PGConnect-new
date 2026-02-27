@@ -20,8 +20,15 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/home" className="flex items-center">
-            <h1 className="text-2xl font-bold text-white hover:text-white/80 transition-colors">
-              PGConnect
+            <h1 className="text-2xl font-bold hover:opacity-80 transition-opacity">
+              <span className="relative inline-block">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 animate-gradient-flow">PG</span>
+                <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-400 to-blue-300 animate-gradient-flow-reverse blur-sm">PG</span>
+              </span>
+              <span className="relative inline-block">
+                <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 animate-gradient-flow">Connect</span>
+                <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 animate-gradient-flow-reverse blur-sm">Connect</span>
+              </span>
             </h1>
           </Link>
 

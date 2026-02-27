@@ -100,8 +100,15 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent" />
         
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-16">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white tracking-tight">
-            PG<span className="text-yellow-400">Connect</span>
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-tight">
+            <span className="relative inline-block">
+              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 animate-gradient-flow">PG</span>
+              <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-400 to-blue-300 animate-gradient-flow-reverse blur-sm">PG</span>
+            </span>
+            <span className="relative inline-block">
+              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 animate-gradient-flow">Connect</span>
+              <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 animate-gradient-flow-reverse blur-sm">Connect</span>
+            </span>
           </h1>
           
           <p className="text-xl md:text-2xl mb-12 text-gray-200 max-w-3xl mx-auto">
@@ -162,32 +169,32 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-primary" />
+            <Card className="group p-8 transition-all duration-500 bg-gradient-to-br from-card to-primary/5 border-2 hover:border-primary/50 hover:shadow-[0_0_40px_rgba(var(--primary),0.3)] animate-card-breathe">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mb-6 group-hover:animate-bounce-slow transition-all duration-300 shadow-lg">
+                <Shield className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Verified & Trusted</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">Verified & Trusted</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 All PG listings are verified with RentRep rating system for complete transparency and safety
               </p>
             </Card>
 
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
-                <Building2 className="h-6 w-6 text-secondary" />
+            <Card className="group p-8 transition-all duration-500 bg-gradient-to-br from-card to-blue-500/5 border-2 hover:border-blue-500/50 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] animate-card-breathe" style={{ animationDelay: '0.2s' }}>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 group-hover:animate-bounce-slow transition-all duration-300 shadow-lg">
+                <Building2 className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Smart Management</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-2xl font-bold mb-4 group-hover:text-blue-600 transition-colors">Smart Management</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Real-time dashboard with 3D visualization, occupancy tracking, and automated rent reminders
               </p>
             </Card>
 
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
-                <Sparkles className="h-6 w-6 text-accent" />
+            <Card className="group p-8 transition-all duration-500 bg-gradient-to-br from-card to-purple-500/5 border-2 hover:border-purple-500/50 hover:shadow-[0_0_40px_rgba(168,85,247,0.3)] animate-card-breathe" style={{ animationDelay: '0.4s' }}>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 group-hover:animate-bounce-slow transition-all duration-300 shadow-lg">
+                <Sparkles className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3">AI-Powered Matching</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-2xl font-bold mb-4 group-hover:text-purple-600 transition-colors">AI-Powered Matching</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Find compatible roommates with our AI-driven matching system based on habits and preferences
               </p>
             </Card>

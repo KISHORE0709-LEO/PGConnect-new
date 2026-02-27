@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/config/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface Occupant {
   name: string;
@@ -40,36 +40,39 @@ export const useTenantData = (pgId: string | undefined, refreshTrigger?: number)
         setLoading(true);
         setError(null);
 
-        const roomsRef = collection(db, 'pgs', pgId, 'rooms');
-        const roomsSnapshot = await getDocs(roomsRef);
+        // Fetch PG document
+        const pgRef = doc(db, 'pgs', pgId);
+        const pgSnap = await getDoc(pgRef);
 
-        const rooms: Room[] = roomsSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            roomNo: data.roomNo,
-            floorNo: data.floorNo,
-            occupants: data.occupants?.map((occ: any) => ({
+        if (!pgSnap.exists()) {
+          setError('PG not found');
+          setLoading(false);
+          return;
+        }
+
+        const pgData = pgSnap.data();
+        const buildingConfig = pgData.buildingConfiguration;
+
+        if (!buildingConfig || !buildingConfig.floors) {
+          setError('No building configuration found');
+          setLoading(false);
+          return;
+        }
+
+        // Transform building configuration to expected format
+        const floors: Floor[] = buildingConfig.floors.map((floor: any, index: number) => ({
+          floorNo: floor.number || index,
+          rooms: floor.rooms.map((room: any) => ({
+            roomNo: room.number || room.id,
+            floorNo: floor.number || index,
+            occupants: room.occupants?.map((occ: any) => ({
               name: occ.name,
               email: occ.email,
               phone: occ.phone,
-              rentPaid: occ.rentStatus || false,
+              rentPaid: occ.rentPaid || occ.rentStatus || false,
             })) || [],
-          };
-        });
-
-        const floorsMap = new Map<number, Room[]>();
-        rooms.forEach(room => {
-          const floorNo = room.floorNo || 1;
-          if (!floorsMap.has(floorNo)) {
-            floorsMap.set(floorNo, []);
-          }
-          floorsMap.get(floorNo)!.push(room);
-        });
-
-        const floors: Floor[] = Array.from(floorsMap.entries()).map(([floorNo, rooms]) => ({
-          floorNo,
-          rooms,
-        })).sort((a, b) => b.floorNo - a.floorNo);
+          }))
+        }));
 
         setBuildingData({ floors });
       } catch (err) {

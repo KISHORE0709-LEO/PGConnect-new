@@ -458,7 +458,7 @@ const OwnerDashboard = () => {
                       size="sm"
                       onClick={() => navigate(`/owner/tenants/${pg.id}`)}
                     >
-                      Assign Tenant
+                      Manage Tenants
                     </Button>
                   </div>
                 </Card>

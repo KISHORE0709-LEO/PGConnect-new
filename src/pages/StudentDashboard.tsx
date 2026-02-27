@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { COLLEGES_BY_CITY } from "@/config/citiesAndColleges";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -194,7 +195,8 @@ const StudentDashboard = () => {
     fetchPGs();
   }, []);
   const [college, setCollege] = useState("");
-  const [colleges, setColleges] = useState(['NMIT', 'RVCE', 'IISc', 'BMSIT', 'RNSIT', 'GITAM', 'Others']);
+  const [customCollegeLink, setCustomCollegeLink] = useState("");
+  const availableColleges = selectedCity ? COLLEGES_BY_CITY[selectedCity] || [] : [];
   const [distance, setDistance] = useState("");
   const [gender, setGender] = useState("any");
   const [minPrice, setMinPrice] = useState("");
@@ -510,12 +512,23 @@ const StudentDashboard = () => {
                     className="w-full p-2 border rounded-md"
                   >
                     <option value="">Select College</option>
-                    {colleges.map((col) => (
+                    {availableColleges.map((col) => (
                       <option key={col} value={col.toLowerCase()}>
                         {col}
                       </option>
                     ))}
                   </select>
+                  {college === 'other' && (
+                    <div className="mt-3">
+                      <Label className="text-xs text-muted-foreground mb-1 block">College Google Maps Link</Label>
+                      <Input
+                        placeholder="Paste Google Maps link"
+                        value={customCollegeLink}
+                        onChange={(e) => setCustomCollegeLink(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Distance */}

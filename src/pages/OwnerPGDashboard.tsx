@@ -20,53 +20,35 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import InteractiveBuildingLayout from "@/components/InteractiveBuildingLayout";
+import BuildingVisualizer from "@/components/BuildingVisualizer";
 
 const OwnerPGDashboard = () => {
   const navigate = useNavigate();
-  const { pgId } = useParams();
+  const { id } = useParams();
+  const pgId = id;
   const [pgData, setPgData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPGData = async () => {
       if (!pgId) {
+        console.log('No pgId provided');
         setLoading(false);
         return;
       }
       
       try {
-        // First try to get by document ID
+        console.log('Fetching PG with ID:', pgId);
         const docRef = doc(db, 'pgs', pgId);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          setPgData({ id: docSnap.id, ...docSnap.data() });
+          const data = { id: docSnap.id, ...docSnap.data() };
+          console.log('PG data found:', data);
+          setPgData(data);
         } else {
-          // If not found by ID, try to find by owner email (for newly created PGs)
-          const { auth } = await import('@/config/firebase');
-          const { collection, query, where, getDocs } = await import('firebase/firestore');
-          const currentUser = auth.currentUser;
-          
-          if (currentUser) {
-            const pgsQuery = query(
-              collection(db, 'pgs'),
-              where('ownerEmail', '==', currentUser.email)
-            );
-            const pgsSnapshot = await getDocs(pgsQuery);
-            
-            if (!pgsSnapshot.empty) {
-              // Get the first PG (or the one matching the ID)
-              const pgDoc = pgsSnapshot.docs.find(doc => doc.id === pgId) || pgsSnapshot.docs[0];
-              setPgData({ id: pgDoc.id, ...pgDoc.data() });
-            } else {
-              console.log('No PG found for this owner');
-              setPgData(null);
-            }
-          } else {
-            console.log('No authenticated user');
-            setPgData(null);
-          }
+          console.log('PG document not found with ID:', pgId);
+          setPgData(null);
         }
       } catch (error) {
         console.error('Error fetching PG:', error);
@@ -132,122 +114,40 @@ const OwnerPGDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* PG Details */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2">
-            <Card className="p-6">
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold mb-2">{pgData.name}</h1>
-                <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{pgData.address}</span>
-                </div>
-                <div className="flex items-center gap-4 mb-4">
-                  <Badge variant="secondary">{pgData.pgType} PG</Badge>
-                  <Badge variant="outline">{pgData.nearestCollege} - {pgData.distance}km</Badge>
-                </div>
-                <div className="text-2xl font-bold text-primary mb-4">
-                  ₹{pgData.monthlyRent?.toLocaleString()}
-                  <span className="text-sm text-muted-foreground ml-2">per month</span>
-                </div>
-                <p className="text-muted-foreground">{pgData.description}</p>
-              </div>
-
-              {/* Amenities */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Amenities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {pgData.amenities?.map((amenity, index) => {
-                    const IconComponent = getAmenityIcon(amenity);
-                    return (
-                      <div key={index} className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
-                        <IconComponent className="h-4 w-4" />
-                        <span className="text-sm">{amenity}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Stats */}
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Room Summary</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Total Rooms</span>
-                  <span className="font-semibold">{totalRooms}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Occupied</span>
-                  <span className="font-semibold text-red-600">{occupiedRooms}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Available</span>
-                  <span className="font-semibold text-green-600">{availableRooms}</span>
-                </div>
-                <div className="pt-2 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Occupancy Rate</span>
-                    <span className="font-semibold">{totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) : 0}%</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Monthly Revenue</span>
-                    <span className="font-semibold text-primary">₹{monthlyRevenue.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">House Rules</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span>Gate Opens</span>
-                  <span className="font-medium">{pgData.gateOpening || 'Not set'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Gate Closes</span>
-                  <span className="font-medium">{pgData.gateClosing || 'Not set'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Smoking</span>
-                  <Badge variant={pgData.smokingAllowed ? "default" : "secondary"}>
-                    {pgData.smokingAllowed ? 'Allowed' : 'Not Allowed'}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span>Drinking</span>
-                  <Badge variant={pgData.drinkingAllowed ? "default" : "secondary"}>
-                    {pgData.drinkingAllowed ? 'Allowed' : 'Not Allowed'}
-                  </Badge>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Status</h3>
-              <div className="text-center">
-                <Badge 
-                  variant={pgData.availability === 'open' ? "default" : "secondary"}
-                  className="text-lg px-4 py-2"
-                >
-                  {pgData.availability === 'open' ? 'Open for Bookings' : 'Closed'}
-                </Badge>
-              </div>
-            </Card>
+        {/* PG Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">{pgData.name}</h1>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MapPin className="h-4 w-4" />
+            <span>{pgData.address}</span>
           </div>
         </div>
 
-        {/* Interactive Building Layout */}
-        <InteractiveBuildingLayout 
-          buildingConfig={pgData.buildingConfiguration}
-          pgName={pgData.name}
-        />
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground mb-1">Total Rooms</div>
+            <div className="text-2xl font-bold">{totalRooms}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground mb-1">Occupied</div>
+            <div className="text-2xl font-bold text-red-600">{occupiedRooms}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground mb-1">Available</div>
+            <div className="text-2xl font-bold text-green-600">{availableRooms}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground mb-1">Monthly Revenue</div>
+            <div className="text-2xl font-bold text-primary">₹{monthlyRevenue.toLocaleString()}</div>
+          </Card>
+        </div>
+
+        {/* Building Layout */}
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-6">Building Layout</h2>
+          <BuildingVisualizer buildingData={pgData.buildingConfiguration} />
+        </Card>
       </div>
     </div>
   );

@@ -20,6 +20,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import FlexibleBuildingConfig from "@/components/FlexibleBuildingConfig";
+import { CITIES, COLLEGES_BY_CITY } from "@/config/citiesAndColleges";
+import { initializeCitiesAndColleges } from "@/utils/initializeFirebaseData";
 
 // Generate default room layout for new PGs
 const generateDefaultRoomLayout = (totalRooms: number, baseRent: number) => {
@@ -65,6 +67,7 @@ const RegisterPG = () => {
   const [step, setStep] = useState(1);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showBuildingConfig, setShowBuildingConfig] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -76,6 +79,7 @@ const RegisterPG = () => {
     totalRooms: "",
     monthlyRent: "",
     nearestCollege: "",
+    customCollegeLink: "",
     distance: "",
     amenities: [] as string[],
     gateClosing: "",
@@ -84,9 +88,14 @@ const RegisterPG = () => {
     drinkingAllowed: false,
     availability: "open",
     images: [] as File[],
-    // Building config - flexible structure
-    buildingFloors: []
+    buildingFloors: [],
+    govtId: null as File | null,
+    propertyDoc: null as File | null,
+    tradeLicense: null as File | null,
+    utilityBill: null as File | null
   });
+
+  const availableColleges = formData.city ? COLLEGES_BY_CITY[formData.city] || [] : [];
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -124,11 +133,14 @@ const RegisterPG = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
+      console.log('Submit button clicked');
       console.log('User object:', user);
       
       if (!user) {
         toast.error('Please login to register PG');
+        setIsSubmitting(false);
         return;
       }
 
@@ -138,14 +150,24 @@ const RegisterPG = () => {
       
       if (!currentUser) {
         toast.error('Please login to register PG');
+        setIsSubmitting(false);
         return;
       }
+
+      // Store document file names instead of uploading (temporary solution)
+      const documentInfo: any = {};
+      if (formData.govtId) documentInfo.govtId = formData.govtId.name;
+      if (formData.propertyDoc) documentInfo.propertyDoc = formData.propertyDoc.name;
+      if (formData.tradeLicense) documentInfo.tradeLicense = formData.tradeLicense.name;
+      if (formData.utilityBill) documentInfo.utilityBill = formData.utilityBill.name;
+
+      toast.info('Saving PG data...');
 
       const pgData = {
         name: formData.pgName,
         description: formData.description,
         address: formData.address,
-        city: formData.city || 'Bangalore',
+        city: formData.city || 'Bengaluru',
         state: 'Karnataka',
         pincode: '560001',
         pgType: formData.pgType,
@@ -153,6 +175,7 @@ const RegisterPG = () => {
         availableRooms: parseInt(formData.totalRooms) || 10,
         monthlyRent: parseInt(formData.monthlyRent) || 8500,
         nearestCollege: formData.nearestCollege,
+        customCollegeLink: formData.customCollegeLink || '',
         distance: parseFloat(formData.distance) || 0,
         amenities: formData.amenities,
         gateClosing: formData.gateClosing,
@@ -160,11 +183,12 @@ const RegisterPG = () => {
         smokingAllowed: formData.smokingAllowed,
         drinkingAllowed: formData.drinkingAllowed,
         availability: formData.availability,
-        ownerId: currentUser.uid, // Use Firebase UID
+        ownerId: currentUser.uid,
         ownerName: user.name || currentUser.displayName || user.email || 'Unknown',
         ownerEmail: user.email || currentUser.email || '',
         ownerPhone: user.phone || '',
-        // Add building layout data with proper structure
+        verificationDocuments: documentInfo,
+        verificationStatus: 'pending',
         buildingConfiguration: {
           floors: [],
           totalFloors: Math.ceil(parseInt(formData.totalRooms) / 6) || 2,
@@ -201,6 +225,8 @@ const RegisterPG = () => {
     } catch (error) {
       console.error('Error registering PG:', error);
       toast.error(`Failed to register PG: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -318,7 +344,7 @@ const RegisterPG = () => {
                     {i < step ? <CheckCircle2 className="h-5 w-5" /> : i}
                   </div>
                   <span className="font-medium hidden sm:inline">
-                    {i === 1 ? 'Basic Info' : i === 2 ? 'Rooms & Amenities' : 'Rules & Media'}
+                    {i === 1 ? 'Basic Info' : i === 2 ? 'Rooms & Amenities' : 'Verification & Media'}
                   </span>
                 </div>
                 {i < 3 && <div className={`w-12 h-0.5 ${i < step ? 'bg-primary' : 'bg-muted-foreground/30'}`} />}
@@ -421,17 +447,17 @@ const RegisterPG = () => {
 
                 <div>
                   <Label htmlFor="city">City</Label>
-                  <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
+                  <Select value={formData.city} onValueChange={(value) => {
+                    handleInputChange('city', value);
+                    handleInputChange('nearestCollege', '');
+                  }}>
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select city" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="bangalore">Bangalore</SelectItem>
-                      <SelectItem value="mumbai">Mumbai</SelectItem>
-                      <SelectItem value="delhi">Delhi</SelectItem>
-                      <SelectItem value="pune">Pune</SelectItem>
-                      <SelectItem value="hyderabad">Hyderabad</SelectItem>
-                      <SelectItem value="chennai">Chennai</SelectItem>
+                      {CITIES.map(city => (
+                        <SelectItem key={city} value={city}>{city}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -454,16 +480,18 @@ const RegisterPG = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="nearestCollege">Nearest College</Label>
-                  <Select value={formData.nearestCollege} onValueChange={(value) => handleInputChange('nearestCollege', value)}>
+                  <Select 
+                    value={formData.nearestCollege} 
+                    onValueChange={(value) => handleInputChange('nearestCollege', value)}
+                    disabled={!formData.city}
+                  >
                     <SelectTrigger className="mt-2">
-                      <SelectValue placeholder="Select college" />
+                      <SelectValue placeholder={formData.city ? "Select college" : "Select city first"} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="iit">IIT Bangalore</SelectItem>
-                      <SelectItem value="iisc">IISc Bangalore</SelectItem>
-                      <SelectItem value="christ">Christ University</SelectItem>
-                      <SelectItem value="rvce">RVCE</SelectItem>
-                      <SelectItem value="pesit">PESIT</SelectItem>
+                      {availableColleges.map(college => (
+                        <SelectItem key={college} value={college}>{college}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">Select the college closest to your PG</p>
@@ -481,6 +509,21 @@ const RegisterPG = () => {
                   />
                 </div>
               </div>
+
+              {formData.nearestCollege === 'Other' && (
+                <div>
+                  <Label htmlFor="customCollegeLink">College Google Maps Link</Label>
+                  <Input
+                    id="customCollegeLink"
+                    type="url"
+                    placeholder="Paste Google Maps link of your college"
+                    value={formData.customCollegeLink}
+                    onChange={(e) => handleInputChange('customCollegeLink', e.target.value)}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">We'll use this to calculate distance from your PG</p>
+                </div>
+              )}
 
               <div>
                 <Label>Amenities</Label>
@@ -518,10 +561,42 @@ const RegisterPG = () => {
         {/* Step 3: Rules & Media */}
         {step === 3 && (
           <Card className="p-8">
-            <h2 className="text-2xl font-bold mb-6">Step 3: Rules & Media</h2>
-            <p className="text-muted-foreground mb-6">Set your rules and upload high-quality photos</p>
+            <h2 className="text-2xl font-bold mb-6">Step 3: Verification & Media</h2>
+            <p className="text-muted-foreground mb-6">Upload verification documents and property photos</p>
 
             <div className="space-y-6">
+              {/* Document Verification Section */}
+              <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg mb-1">Digital Document Verification (Compulsory)</h3>
+                    <p className="text-sm text-muted-foreground">Upload required documents for verification</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label>Government ID (Aadhaar / PAN)</Label>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleInputChange('govtId', e.target.files?.[0])} className="mt-2" />
+                  </div>
+                  <div>
+                    <Label>Property Ownership Document OR Rental Agreement</Label>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleInputChange('propertyDoc', e.target.files?.[0])} className="mt-2" />
+                  </div>
+                  <div>
+                    <Label>Local Trade License (if applicable)</Label>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleInputChange('tradeLicense', e.target.files?.[0])} className="mt-2" />
+                  </div>
+                  <div>
+                    <Label>Utility Bill (electricity/water)</Label>
+                    <Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleInputChange('utilityBill', e.target.files?.[0])} className="mt-2" />
+                  </div>
+                </div>
+
+              </Card>
               <div>
                 <Label htmlFor="pgRules">PG Rules</Label>
                 <p className="text-xs text-muted-foreground mb-2">Specify the house rules for your PG</p>
@@ -631,9 +706,18 @@ const RegisterPG = () => {
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Previous Step
                 </Button>
-                <Button onClick={handleSubmit} className="flex-1" size="lg">
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Submit Listing
+                <Button onClick={handleSubmit} className="flex-1" size="lg" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Submit Listing
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

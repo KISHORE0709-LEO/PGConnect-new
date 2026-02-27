@@ -8,6 +8,7 @@ import PGDetails from "./pages/PGDetails";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import OwnerRedirect from "./pages/OwnerRedirect";
 import OwnerPGDashboard from "./pages/OwnerPGDashboard";
+import ManageTenants from "./pages/ManageTenants";
 import PGManagement from "./pages/PGManagement";
 import ImportData from "./pages/ImportData";
 import RegisterPG from "./pages/RegisterPG";
@@ -29,6 +30,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import SplineChatbot from "./components/SplineChatbot";
+import AdminInit from "./pages/AdminInit";
 
 const App = () => (
   <AuthProvider>
@@ -81,7 +83,7 @@ const App = () => (
           <Route path="/owner/tenants/:id" element={
             <>
               <Navbar />
-              <div className="flex-1"><OwnerPGDashboard /></div>
+              <div className="flex-1"><ManageTenants /></div>
               <Footer />
             </>
           } />
@@ -171,6 +173,7 @@ const App = () => (
             </>
           } />
           <Route path="/import-data" element={<ImportData />} />
+          <Route path="/admin-init" element={<AdminInit />} />
           <Route path="*" element={
             <>
               <Navbar />

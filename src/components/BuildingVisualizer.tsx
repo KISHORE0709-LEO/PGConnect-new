@@ -33,6 +33,7 @@ interface BuildingVisualizerProps {
   floors?: number;
   roomsPerFloor?: number;
   pgId?: string;
+  buildingData?: any;
 }
 
 // Generate building data similar to RedBus layout
@@ -74,13 +75,35 @@ const generateBuildingData = (numFloors: number, roomsPerFloor: number): Floor[]
   return floors;
 };
 
-const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId }: BuildingVisualizerProps) => {
+const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId, buildingData: propBuildingData }: BuildingVisualizerProps) => {
   const [buildingData, setBuildingData] = useState<Floor[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBuildingData = async () => {
+      // Use prop data if provided
+      if (propBuildingData?.floors) {
+        const transformedFloors = propBuildingData.floors.map((floor: any, index: number) => ({
+          id: floor.number || index + 1,
+          name: floor.name || (index === 0 ? 'Ground Floor' : `Floor ${index + 1}`),
+          rooms: floor.rooms.map((room: any) => ({
+            id: room.id || room.number,
+            number: room.number,
+            rent: room.rent,
+            capacity: room.capacity || room.sharing,
+            occupied: room.occupied || 0,
+            status: room.status || 'available',
+            occupants: room.occupants || [],
+            amenities: room.amenities || [],
+            sharingType: room.capacity === 1 ? 'Single' : room.capacity === 2 ? 'Double' : 'Triple'
+          }))
+        }));
+        setBuildingData(transformedFloors);
+        setLoading(false);
+        return;
+      }
+
       if (pgId) {
         try {
           const pgDocRef = doc(db, 'pgs', pgId);
@@ -88,30 +111,24 @@ const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId }: BuildingVi
           
           if (pgDocSnap.exists()) {
             const pgData = pgDocSnap.data();
-            if (pgData.buildingLayout && pgData.buildingLayout.rooms) {
-              // Convert Firebase data to floor structure
-              const floorMap = new Map<number, Room[]>();
-              
-              pgData.buildingLayout.rooms.forEach((room: any) => {
-                const floorId = room.floorId || 0;
-                if (!floorMap.has(floorId)) {
-                  floorMap.set(floorId, []);
-                }
-                floorMap.get(floorId)!.push(room);
-              });
-              
-              const floors: Floor[] = [];
-              floorMap.forEach((rooms, floorId) => {
-                floors.push({
-                  id: floorId + 1,
-                  name: floorId === 0 ? "Ground Floor" : `Floor ${floorId + 1}`,
-                  rooms
-                });
-              });
-              
-              setBuildingData(floors);
+            if (pgData.buildingConfiguration?.floors) {
+              const transformedFloors = pgData.buildingConfiguration.floors.map((floor: any, index: number) => ({
+                id: floor.number || index + 1,
+                name: floor.name || (index === 0 ? 'Ground Floor' : `Floor ${index + 1}`),
+                rooms: floor.rooms.map((room: any) => ({
+                  id: room.id || room.number,
+                  number: room.number,
+                  rent: room.rent,
+                  capacity: room.capacity || room.sharing,
+                  occupied: room.occupied || 0,
+                  status: room.status || 'available',
+                  occupants: room.occupants || [],
+                  amenities: room.amenities || [],
+                  sharingType: room.capacity === 1 ? 'Single' : room.capacity === 2 ? 'Double' : 'Triple'
+                }))
+              }));
+              setBuildingData(transformedFloors);
             } else {
-              // Fallback to generated data
               setBuildingData(generateBuildingData(floors, roomsPerFloor));
             }
           }
@@ -126,7 +143,7 @@ const BuildingVisualizer = ({ floors = 2, roomsPerFloor = 12, pgId }: BuildingVi
     };
 
     fetchBuildingData();
-  }, [pgId, floors, roomsPerFloor]);
+  }, [pgId, floors, roomsPerFloor, propBuildingData]);
 
   const getRoomColor = (status: string) => {
     switch (status) {

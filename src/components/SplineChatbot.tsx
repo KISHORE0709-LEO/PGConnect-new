@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import Spline from '@splinetool/react-spline';
+import { useState, Suspense, lazy } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { X, Send } from 'lucide-react';
+import { X, Send, MessageCircle, Bot } from 'lucide-react';
 import { geminiAI } from '@/lib/geminiAI';
+
+const Spline = lazy(() => import('@splinetool/react-spline'));
 
 interface Message {
   id: number;
@@ -66,15 +67,30 @@ const SplineChatbot = () => {
   return (
     <>
       {/* Spline Robot - Slightly Larger */}
-      <div 
-        className="fixed bottom-6 right-6 z-50 w-36 h-36 cursor-pointer hover:scale-105 transition-transform duration-200"
-        onClick={() => setIsChatOpen(true)}
-      >
-        <Spline
-          scene="https://prod.spline.design/rU2-Ks0SC0T5od9B/scene.splinecode"
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
+      {!isChatOpen && (
+        <div 
+          className="fixed bottom-6 right-6 z-50 cursor-pointer hover:scale-105 transition-transform duration-200"
+          onClick={() => setIsChatOpen(true)}
+        >
+          <Suspense fallback={
+            <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center shadow-lg animate-pulse">
+              <Bot className="h-8 w-8 text-white" />
+            </div>
+          }>
+            <div className="w-36 h-36">
+              <Spline
+                scene="https://prod.spline.design/rU2-Ks0SC0T5od9B/scene.splinecode"
+                style={{ width: '100%', height: '100%' }}
+                onError={() => (
+                  <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
+                    <MessageCircle className="h-8 w-8 text-white" />
+                  </div>
+                )}
+              />
+            </div>
+          </Suspense>
+        </div>
+      )}
 
       {/* Chat Interface */}
       {isChatOpen && (
@@ -83,11 +99,8 @@ const SplineChatbot = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-blue-600 text-white rounded-t-lg">
               <div className="flex items-center gap-2">
-                <div className="w-12 h-12 rounded-full overflow-hidden">
-                  <Spline
-                    scene="https://prod.spline.design/rU2-Ks0SC0T5od9B/scene.splinecode"
-                    style={{ width: '100%', height: '100%', transform: 'scale(1.2)' }}
-                  />
+                <div className="w-12 h-12 rounded-full bg-blue-700 flex items-center justify-center">
+                  <Bot className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">Chitti</h3>
